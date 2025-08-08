@@ -72,9 +72,9 @@
       table-layout: fixed;
     }
     th, td {
-  word-wrap: break-word;
-  white-space: normal;
-  height: auto;
+      word-wrap: break-word;
+      white-space: normal;
+      height: auto;
       border: 1px solid #ffffff33;
       padding: 24px;
       font-size: 40px;
@@ -95,6 +95,7 @@
       <div id="upload">
         <label for="excel-input">📂 Tải Dữ Liệu</label>
         <input type="file" id="excel-input" accept=".xlsx" />
+        <button onclick="clearSavedData()" style="margin-left: 10px; font-size: 16px;">🗑 Xoá Lưu</button>
       </div>
       <h1>KẾ HOẠCH XUẤT HÀNG</h1>
       <div id="clock" style="font-size: 50px; font-weight: bold; color: white; min-width: 100px; text-align: right;">00:00:00</div>

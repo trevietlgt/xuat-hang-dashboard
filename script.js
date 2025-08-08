@@ -55,6 +55,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const workbook = XLSX.read(data, { type: "array", codepage: 65001 });
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
         const rows = XLSX.utils.sheet_to_json(sheet, { header: true });
+saveDataToLocal(rows);
         prepareGroupedTrips(rows);
         showTripSlide(0);
   updateTripIndicator();
@@ -87,6 +88,7 @@ if (document.documentElement.requestFullscreen) {
         const workbook = XLSX.read(data, { type: 'array', codepage: 65001 });
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
         const rows = XLSX.utils.sheet_to_json(sheet, { header: true });
+saveDataToLocal(rows);
         prepareGroupedTrips(rows);
         showTripSlide(0);
   updateTripIndicator();
@@ -223,4 +225,28 @@ document.addEventListener("DOMContentLoaded", () => {
   if (document.documentElement.requestFullscreen) {
     document.documentElement.requestFullscreen();
   }
+});
+
+function saveDataToLocal(rows) {
+  localStorage.setItem("dashboardData", JSON.stringify(rows));
+}
+function loadDataFromLocal() {
+  const stored = localStorage.getItem("dashboardData");
+  if (!stored) return;
+  try {
+    const rows = JSON.parse(stored);
+    prepareGroupedTrips(rows);
+    showTripSlide(0);
+    updateTripIndicator();
+    updateMarqueeFromThongBao(rows);
+  } catch (e) {
+    console.error("Dữ liệu localStorage không hợp lệ", e);
+  }
+}
+function clearSavedData() {
+  localStorage.removeItem("dashboardData");
+  location.reload();
+}
+document.addEventListener("DOMContentLoaded", () => {
+  loadDataFromLocal();
 });
