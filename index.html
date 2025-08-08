@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -11,22 +12,58 @@
       background-color: #000814;
       color: white;
     }
-    h1 {
-      text-align: center;
+    #title-bar {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       background-color: #003566;
-      margin: 0;
-      padding: 30px 0;
-      font-size: 60px;
-      text-transform: uppercase;
-      letter-spacing: 2px;
+      padding: 10px 40px;
     }
-    #upload {
+    #title-header {
+      display: flex;
+      width: 100%;
+      justify-content: space-between;
+      align-items: center;
+    }
+    h1 {
+      flex: 1;
       text-align: center;
-      margin: 30px;
-      font-size: 32px;
+      font-size: 48px;
+      margin: 0;
+      color: white;
+    }
+    #upload label {
+      background-color: #0077cc;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 20px;
     }
     input[type="file"] {
-      font-size: 28px;
+      display: none;
+    }
+    #clock {
+      font-size: 20px;
+      color: white;
+      min-width: 100px;
+      text-align: right;
+    }
+    #marquee {
+      overflow: hidden;
+      width: 100%;
+      margin-top: 10px;
+    }
+    #marquee-text {
+      display: inline-block;
+      white-space: nowrap;
+      padding-left: 100%;
+      font-size: 20px;
+      animation: marquee-scroll 40s linear infinite;
+    }
+    @keyframes marquee-scroll {
+      0%   { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
     }
     table {
       width: 100%;
@@ -35,31 +72,44 @@
       table-layout: fixed;
     }
     th, td {
+  word-wrap: break-word;
+  white-space: normal;
+  height: auto;
       border: 1px solid #ffffff33;
       padding: 24px;
-      text-align: center;
       font-size: 40px;
+      text-align: center;
     }
     thead {
       background-color: #001d3d;
       color: #ffffff;
       text-transform: uppercase;
     }
-    tbody tr:nth-child(even) { background-color: #001a33; }
-    tbody tr:nth-child(odd) { background-color: #002244; }
-    .status-hoanthanh { background-color: #198754; color: white; font-weight: bold; }
-    .status-dangcho { background-color: #ffc107; color: black; font-weight: bold; }
-    .status-huy { background-color: #dc3545; color: white; font-weight: bold; }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="script.js"></script>
 </head>
 <body>
-  <h1>Kế Hoạch Xuất Hàng</h1>
-  <div id="upload">
-    📂 Chọn file Excel:
-    <input type="file" id="excel-input" accept=".xlsx" />
+  <div id="title-bar">
+    <div id="title-header">
+      <div id="upload">
+        <label for="excel-input">📂 Tải Dữ Liệu</label>
+        <input type="file" id="excel-input" accept=".xlsx" />
+      </div>
+      <h1>KẾ HOẠCH XUẤT HÀNG</h1>
+      <div id="clock" style="font-size: 50px; font-weight: bold; color: white; min-width: 100px; text-align: right;">00:00:00</div>
+    </div>
+    <div id="marquee">
+      <div id="marquee-text">Vui lòng tải file để hiển thị thông báo...</div>
+    </div>
   </div>
+
+  <div id="controls" style="display:flex;justify-content:center;gap:30px;margin:20px 0;">
+    <button class="btn-control" onclick="prevSlide()">⬅ PREV</button>
+    <button class="btn-control" onclick="nextSlide()">NEXT ➡</button>
+  </div>
+
+  <div id="trip-indicator" style="text-align:center;font-size:32px;margin-bottom:10px;font-weight:bold;"></div>
 
   <table>
     <thead>
@@ -73,5 +123,17 @@
     </thead>
     <tbody id="dashboard-body"></tbody>
   </table>
+
+  <script>
+    function updateClock() {
+      const now = new Date();
+      const h = String(now.getHours()).padStart(2, '0');
+      const m = String(now.getMinutes()).padStart(2, '0');
+      const s = String(now.getSeconds()).padStart(2, '0');
+      document.getElementById('clock').textContent = h + ':' + m + ':' + s;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+  </script>
 </body>
 </html>
