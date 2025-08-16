@@ -1,70 +1,139 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Google Slides Fullscreen</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Slides 16:9 – Web thường + Fullscreen đúng chuẩn</title>
   <style>
-    html, body {
+    :root {
+      --bg: #000;
+      --fg: #fff;
+      --accent: #22c55e;
+      --muted: #9ca3af;
+      --danger: #ef4444;
+    }
+    html, body { height: 100%; }
+    body {
       margin: 0;
-      height: 100%;
-      background: black;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      display: grid;
+      place-items: center;
       overflow: hidden;
     }
 
-    .iframe-container {
+    /* Khung 16:9 fit màn hình */
+    .stage {
+      width: min(100vw, calc(100vh * 16/9));
+      height: min(calc(100vw * 9/16), 100vh);
       position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 10px 35px rgba(0,0,0,.5);
+      background: #111;
+    }
+
+    iframe.slides {
+      position: absolute;
+      inset: 0;
       width: 100%;
       height: 100%;
-      max-width: 100vw;
-      max-height: 100vh;
-    }
-
-    .iframe-container iframe {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 100vw;
-      height: 56.25vw; /* 16:9 */
-      max-height: 100vh;
-      max-width: 177.78vh;
-      transform: translate(-50%, -50%);
       border: none;
+      background: #111;
+      /* QUAN TRỌNG: quyền fullscreen cấp ở attribute allow ngay dưới */
     }
 
-    #notice {
-      position: absolute;
-      bottom: 20px;
+    .controls {
+      position: fixed;
+      bottom: 16px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(0,0,0,0.7);
-      color: #fff;
-      padding: 10px 20px;
-      border-radius: 6px;
-      font-size: 16px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      background: rgba(0,0,0,.6);
+      padding: 10px 14px;
+      border-radius: 999px;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 6px 20px rgba(0,0,0,.35);
     }
+    .btn {
+      appearance: none;
+      border: none;
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-weight: 600;
+      color: var(--fg);
+      background: #1f2937;
+      cursor: pointer;
+    }
+    .btn-primary { background: var(--accent); color: #052e16; }
+    .hint { color: var(--muted); font-size: 13px; }
+    .err { color: var(--danger); font-size: 13px; display:none; }
   </style>
 </head>
 <body>
-  <div class="iframe-container">
-    <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vSOc19afkG2M1iF6au6GzLfB0IP80nRjgtWgQl0h7sM9LOZ2OWkYYxie-bPH3CjH-NRLbqHp8WoYz8p/pubembed?start=true&loop=true&delayms=5000" frameborder="0" width="1440" height="839" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
+  <div class="stage" id="stage">
+    <!--
+      LƯU Ý QUAN TRỌNG VỀ QUYỀN FULLSCREEN:
+      - Chuẩn mới yêu cầu attribute allow="fullscreen" trên <iframe>.
+      - allowfullscreen cũ vẫn giữ để tương thích.
+      - Nếu TRANG NÀY bị nhúng trong một iframe khác (parent), parent cũng PHẢI có allow="fullscreen" cho iframe của nó.
+      - Một số host có header Permissions-Policy chặn fullscreen; khi đó sẽ báo "Disallowed by permissions policy".
+    -->
+    <iframe
+      class="slides"
+      id="slides"
+      src="https://docs.google.com/presentation/d/e/2PACX-1vSOc19afkG2M1iF6au6GzLfB0IP80nRjgtWgQl0h7sM9LOZ2OWkYYxie-bPH3CjH-NRLbqHp8WoYz8p/pubembed?start=true&loop=true&delayms=5000"
+      allow="fullscreen; autoplay"
+      allowfullscreen
+      mozallowfullscreen
+      webkitallowfullscreen
+    ></iframe>
   </div>
 
-  <div id="notice">👉 Bấm vào màn hình để bật fullscreen</div>
+  <div class="controls">
+    <button class="btn btn-primary" id="btnFS">Bật toàn màn hình</button>
+    <span class="hint">Web thường cần thao tác người dùng.</span>
+    <span class="err" id="err"></span>
+  </div>
 
   <script>
-    document.body.addEventListener("click", () => {
-      document.documentElement.requestFullscreen();
-      document.getElementById("notice").style.display = "none";
-    }, { once: true });
+    const errEl = document.getElementById('err');
+    const stage = document.getElementById('stage');
 
-    document.body.addEventListener("keydown", () => {
-      document.documentElement.requestFullscreen();
-      document.getElementById("notice").style.display = "none";
-    }, { once: true });
+    async function goFullscreen() {
+      errEl.style.display = 'none';
+      errEl.textContent = '';
+      try {
+        // Ưu tiên xin fullscreen cho toàn trang
+        if (!document.fullscreenElement) {
+          await document.documentElement.requestFullscreen();
+        }
+      } catch (e1) {
+        // Thử xin fullscreen trên khung 16:9
+        try {
+          await stage.requestFullscreen();
+        } catch (e2) {
+          errEl.textContent = (e2 && e2.message)
+            ? e2.message
+            : 'Không thể bật fullscreen (có thể do Permissions Policy hoặc thiếu thao tác người dùng).';
+          errEl.style.display = 'inline-block';
+          console.error('Fullscreen error:', e2 || e1);
+        }
+      }
+    }
+
+    // Web thường: chỉ bật sau user gesture
+    document.getElementById('btnFS').addEventListener('click', goFullscreen);
+    document.addEventListener('keydown', () => {
+      if (!document.fullscreenElement) goFullscreen();
+    });
+
+    // Auto-try sau cú click đầu tiên ở bất kỳ đâu (giảm ma sát)
+    const tryOnce = () => { goFullscreen(); document.removeEventListener('click', tryOnce); };
+    document.addEventListener('click', tryOnce, { once: true });
   </script>
 </body>
 </html>
