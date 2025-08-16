@@ -1,1 +1,76 @@
-<iframe src="https://docs.google.com/presentation/d/e/2PACX-1vSOc19afkG2M1iF6au6GzLfB0IP80nRjgtWgQl0h7sM9LOZ2OWkYYxie-bPH3CjH-NRLbqHp8WoYz8p/pubembed?start=true&loop=true&delayms=5000" frameborder="0" width="960" height="569" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Google Slides Auto Fullscreen</title>
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .iframe-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      max-width: 100vw;
+      max-height: 100vh;
+    }
+
+    .iframe-container iframe {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 100vw;
+      height: 56.25vw; /* tỷ lệ 16:9 */
+      max-height: 100vh;
+      max-width: 177.78vh;
+      transform: translate(-50%, -50%);
+      border: none;
+    }
+
+    #notice {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.6);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="iframe-container">
+    <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vSOc19afkG2M1iF6au6GzLfB0IP80nRjgtWgQl0h7sM9LOZ2OWkYYxie-bPH3CjH-NRLbqHp8WoYz8p/pubembed?start=true&loop=true&delayms=5000"
+      allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true">
+    </iframe>
+  </div>
+  <div id="notice">👉 Bấm vào màn hình để bật fullscreen</div>
+
+  <script>
+    async function openFullscreen() {
+      try {
+        await document.documentElement.requestFullscreen();
+      } catch (err) {
+        // nếu bị chặn thì hiển thị hướng dẫn click
+        document.getElementById("notice").style.display = "block";
+        document.body.addEventListener("click", () => {
+          document.documentElement.requestFullscreen();
+        }, { once: true });
+      }
+    }
+
+    window.onload = openFullscreen;
+  </script>
+</body>
+</html>
