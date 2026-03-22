@@ -66,8 +66,11 @@
     .meta-label{font-size:.56vw; color:var(--muted); font-weight:800; text-transform:uppercase; letter-spacing:.08em}
     .meta-value{font-size:.95vw; font-weight:900; margin-top:.1vw}
 
-    .summary-row{ display:grid; grid-template-columns: repeat(4, 1fr);
-      gap:.28vw;
+    .summary-row{
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap:clamp(6px, .3vw, 12px);
+      align-items:stretch;
     }
     .summary-card{
       border:1px solid var(--line); border-radius:.85vw; padding:.28vw .48vw;
@@ -961,3 +964,21 @@
   </script>
 </body>
 </html>
+
+<style>
+.summary-card{
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.summary-note{
+  white-space:nowrap;
+}
+</style>
+
+<style>
+.trip-card.morning{
+  min-height: 420px;
+}
+</style>
