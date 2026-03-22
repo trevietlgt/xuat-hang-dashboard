@@ -161,29 +161,22 @@
     }
     .badge.meta-inline{background:rgba(255,255,255,.06); color:#eef6ff; border:1px solid rgba(255,255,255,.12)}
 
-    .store-list{
-      min-height:0;
-      display:grid;
-      grid-auto-rows:minmax(0, auto);
-      gap:.28vw;
-      align-content:start;
-    }
+    .store-list {
+  gap: 6px;
+}
 
-    .store-row{
-      display:grid; grid-template-columns:4.6vw 1fr;
-      gap:.55vw;
-      align-items:center;
-      border:1px solid rgba(255,255,255,.06);
-      background:rgba(255,255,255,.03);
-      border-radius:.68vw;
-      padding:.38vw .52vw;
-      min-width:0;
-    }
-    .store-seq{
-      font-size:1vw; font-weight:900; color:#9de7ff; text-transform:uppercase;
-      background:rgba(41,182,246,.12); border:1px solid rgba(41,182,246,.22);
-      border-radius:.48vw; padding:.28vw .28vw; text-align:center;
-    }
+    .store-row {
+  display: grid;
+  grid-template-columns: 100px 1fr; /* 🔥 cố định cột STOP */
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 6px 10px;
+}
+    .store-seq {
+  border-radius: 12px;
+}
     .store-main{min-width:0}
     .store-name{
       font-size:1.28vw; font-weight:900; line-height:1.06;
