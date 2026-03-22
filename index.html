@@ -316,9 +316,7 @@
   </div>
 
   <script>
-    const SHEET_ID = '15Jtivb-WUwwTUYTN6pbV3cPzGQ1-fqku93RaKiLzCS8';
-    const GID = '358090930';
-    const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}`;
+    const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSQfyrmniG35M9Hi7VBR_ZDjRlRwc7te3tx1upvWbCsIA2MESeRkp6Wx7zZr_VUflPupi-rbnGFbgM1/pub?gid=358090930&single=true&output=csv';
     const REFRESH_MS = 60_000;
     const TZ = 'Asia/Bangkok';
 
@@ -575,6 +573,8 @@
       const afternoonTrips = trips.filter(x => (parseHourMinute(x.pickupTime)?.hour ?? 0) >= 12);
       const lsps = [...new Set(items.map(x => x.lsp).filter(Boolean))];
       const planDate = items[0]?.date || '';
+      const morningStops = morningTrips.reduce((sum, trip) => sum + trip.stores.length, 0);
+      const afternoonStops = afternoonTrips.reduce((sum, trip) => sum + trip.stores.length, 0);
 
       els.planDate.textContent = toDisplayDate(planDate);
       els.lastUpdated.textContent = formatNow();
@@ -584,8 +584,8 @@
       els.afternoonCount.textContent = String(afternoonTrips.length);
       els.lspCount.textContent = String(lsps.length);
       els.lspList.textContent = lsps.join(' · ') || '-';
-      els.morningHeaderCount.textContent = `${morningTrips.length} trip · ${morningTrips.reduce((sum, trip) => sum + trip.stores.length, 0)} điểm giao`;
-      els.afternoonHeaderCount.textContent = `${afternoonTrips.length} trip · ${afternoonTrips.reduce((sum, trip) => sum + trip.stores.length, 0)} điểm giao`;
+      els.morningHeaderCount.textContent = `${morningTrips.length} trip · ${morningStops} điểm giao`;
+      els.afternoonHeaderCount.textContent = `${afternoonTrips.length} trip · ${afternoonStops} điểm giao`;
       els.footerSource.textContent = `Nguồn dữ liệu: ${sourceLabel} · Tự làm mới mỗi 60 giây`;
 
       renderColumn(els.morningTrack, morningTrips, 'Không có dữ liệu ca sáng');
@@ -623,9 +623,9 @@
       els.lastUpdated.textContent = formatNow();
       try {
         const csvText = await fetchCsvText(`${CSV_URL}&t=${Date.now()}`);
-        renderFromCsvText(csvText, 'Google Sheets CSV');
+        renderFromCsvText(csvText, 'Google Sheets Published CSV');
         setStatus('Đồng bộ OK', 'ok');
-        els.footerHint.textContent = 'Đang lấy dữ liệu trực tiếp từ Google Sheets.';
+        els.footerHint.textContent = 'Đang lấy dữ liệu trực tiếp từ link publish CSV của Google Sheets.';
       } catch (err) {
         console.error(err);
         useSampleData(err && err.message ? err.message : 'Lỗi tải dữ liệu');
@@ -671,6 +671,7 @@
       console.assert(grouped.length === 6, 'Test groupTrips số trip thất bại');
       console.assert(grouped[0].tripNo === '1' && grouped[0].stores.length === 2, 'Test combine cửa hàng cùng trip thất bại');
       console.assert(grouped[2].tripNo === '3' && grouped[2].stores[1].storeId === '1008', 'Test thứ tự cửa hàng trong trip thất bại');
+      console.assert(grouped[0].stores[0].storeId === '1001' && grouped[0].stores[1].storeId === '1007', 'Test giữ đúng thứ tự cửa hàng theo Google Sheet thất bại');
     }
 
     els.reloadBtn.addEventListener('click', () => {
