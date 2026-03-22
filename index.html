@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Outbound Dashboard</title>
+  <title>Outbound Pick Pack Dashboard</title>
   <style>
     :root{
       --bg:#07111f;
@@ -115,7 +115,7 @@
     .trip-grid{
       display:grid;
       grid-template-columns:repeat(3, 1fr);
-      grid-template-rows:repeat(1, 1fr);
+      grid-template-rows:repeat(2, 1fr);
       gap:.8vw;
       height:100%;
       min-height:0;
@@ -210,6 +210,29 @@
       width:.58vw; height:.58vw; border-radius:999px; display:inline-block;
       background:var(--good); box-shadow:0 0 12px rgba(122,240,160,.55);
     }
+
+    .playback-indicator{
+      position:fixed;
+      right:1vw;
+      bottom:1vw;
+      z-index:50;
+      display:flex;
+      align-items:center;
+      gap:.45vw;
+      padding:.5vw .72vw;
+      border-radius:.9vw;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(5,12,23,.78);
+      backdrop-filter:blur(8px);
+      box-shadow:var(--shadow);
+      font-size:.72vw;
+      font-weight:800;
+      color:#eef6ff;
+      user-select:none;
+      pointer-events:none;
+    }
+    .playback-indicator .icon{font-size:.9vw; line-height:1}
+    .playback-indicator.paused{color:#ffe0a3; border-color:rgba(255,190,92,.28)}
     .status-dot.warn{background:var(--warn); box-shadow:0 0 12px rgba(255,202,92,.45)}
     .status-dot.danger{background:var(--danger); box-shadow:0 0 12px rgba(255,127,127,.45)}
 
@@ -244,8 +267,8 @@
         <div class="logo-box">Cello Square</div>
         <div class="logo-box small">Samsung SDS</div>
         <div>
-          <div class="title">Outbound Dashboard</div>
-          
+          <div class="title">Outbound Pick Pack Dashboard</div>
+          <div class="subtitle">TV mode · gộp cửa hàng theo trip · tự lật trang</div>
         </div>
       </div>
       <div class="meta">
@@ -270,14 +293,14 @@
           <div class="summary-label">Tổng điểm giao</div>
           <div id="totalStops" class="summary-value">0</div>
         </div>
-        <div class="summary-note">Total Stores</div>
+        <div class="summary-note">Tổng số cửa hàng cần pick pack</div>
       </div>
       <div class="summary-card">
         <div class="summary-head">
           <div class="summary-label">Tổng chuyến</div>
           <div id="totalTrips" class="summary-value">0</div>
         </div>
-        <div class="summary-note">By Trip No.</div>
+        <div class="summary-note">Đếm theo Trip No.</div>
       </div>
       <div class="summary-card">
         <div class="summary-head">
@@ -335,6 +358,8 @@
     </section>
   </div>
 
+  <div id="playbackIndicator" class="playback-indicator"><span id="playbackIcon" class="icon">▶</span><span id="playbackText">Auto flip đang chạy · chạm để dừng</span></div>
+
   <script src="https://www.gstatic.com/charts/loader.js"></script>
   <script>
     const SHEET_ID = '15Jtivb-WUwwTUYTN6pbV3cPzGQ1-fqku93RaKiLzCS8';
@@ -377,11 +402,15 @@
       pageFlipEvery: document.getElementById('pageFlipEvery'),
       boardStage: document.getElementById('boardStage'),
       tripGrid: document.getElementById('tripGrid'),
-      footerSource: document.getElementById('footerSource')
+      footerSource: document.getElementById('footerSource'),
+      playbackIndicator: document.getElementById('playbackIndicator'),
+      playbackIcon: document.getElementById('playbackIcon'),
+      playbackText: document.getElementById('playbackText')
     };
 
     let refreshTimer = null;
     let flipTimer = null;
+    let isFlipPaused = false;
     let pageState = { pages: [], currentIndex: 0 };
 
     function formatNow() {
@@ -594,7 +623,7 @@
       const head = document.createElement('div');
       head.className = 'trip-headline';
       head.innerHTML =
-        '<div class="trip-route"></div>';
+        '<div class="trip-route">Điểm dừng và tên cửa hàng</div>';
 
       const list = document.createElement('div');
       list.className = 'store-list';
@@ -664,12 +693,50 @@
       }
     }
 
+    function updatePlaybackIndicator() {
+      const canFlip = pageState.pages.length > 1;
+      const paused = isFlipPaused || !canFlip;
+      els.playbackIndicator.classList.toggle('paused', paused);
+      els.playbackIcon.textContent = paused ? '⏸' : '▶';
+
+      if (!canFlip) {
+        els.playbackText.textContent = 'Chỉ có 1 trang · không cần auto flip';
+        return;
+      }
+
+      els.playbackText.textContent = paused
+        ? 'Đang dừng tại màn hình hiện tại · chạm để chạy tiếp'
+        : 'Auto flip đang chạy · chạm để dừng';
+    }
+
+    function stopPageFlip() {
+      if (flipTimer) {
+        clearInterval(flipTimer);
+        flipTimer = null;
+      }
+      updatePlaybackIndicator();
+    }
+
     function startPageFlip() {
       if (flipTimer) clearInterval(flipTimer);
-      if (pageState.pages.length <= 1) return;
+      if (isFlipPaused || pageState.pages.length <= 1) {
+        flipTimer = null;
+        updatePlaybackIndicator();
+        return;
+      }
       flipTimer = setInterval(function(){
         renderPage(pageState.currentIndex + 1);
       }, PAGE_FLIP_MS);
+      updatePlaybackIndicator();
+    }
+
+    function togglePageFlip() {
+      isFlipPaused = !isFlipPaused;
+      if (isFlipPaused) {
+        stopPageFlip();
+      } else {
+        startPageFlip();
+      }
     }
 
     function renderDashboard(items, sourceLabel) {
@@ -697,6 +764,7 @@
 
       renderPage(0);
       startPageFlip();
+      updatePlaybackIndicator();
     }
 
     async function fetchCsvText(url) {
@@ -775,13 +843,13 @@
       try {
         const items = await fetchGoogleSheetViaGviz();
         renderDashboard(items, 'Google Sheet trực tiếp');
-        setStatus(' Đồng bộ OK', 'ok');
+        setStatus('Đồng bộ OK', 'ok');
       } catch (gvizErr) {
         console.warn('GViz lỗi, thử CSV export...', gvizErr);
         try {
           const csvText = await fetchCsvText(CSV_URL + '&t=' + Date.now());
           renderFromCsvText(csvText, 'Google Sheet CSV export');
-          setStatus(' Đồng bộ OK', 'ok');
+          setStatus('Đồng bộ OK', 'ok');
         } catch (csvErr) {
           console.error(csvErr);
           useSampleData((csvErr && csvErr.message) || (gvizErr && gvizErr.message) || 'Lỗi tải dữ liệu');
@@ -793,6 +861,10 @@
       if (refreshTimer) clearInterval(refreshTimer);
       refreshTimer = setInterval(loadRemoteData, REFRESH_MS);
     }
+
+    document.addEventListener('click', function(){
+      togglePageFlip();
+    });
 
     function runTests() {
       const t1 = csvToRows('A,B\n1,2');
