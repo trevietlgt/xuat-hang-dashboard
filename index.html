@@ -66,8 +66,7 @@
     .meta-label{font-size:.56vw; color:var(--muted); font-weight:800; text-transform:uppercase; letter-spacing:.08em}
     .meta-value{font-size:.95vw; font-weight:900; margin-top:.1vw}
 
-    .summary-row{
-      display:grid; grid-template-columns: repeat(5, 1fr);
+    .summary-row{ display:grid; grid-template-columns: repeat(4, 1fr);
       gap:.28vw;
     }
     .summary-card{
@@ -80,9 +79,9 @@
       gap:.12vw;
     }
     .summary-head{display:flex; align-items:baseline; justify-content:space-between; gap:.5vw}
-    .summary-label{font-size:.58vw; color:var(--muted); font-weight:800; text-transform:uppercase; letter-spacing:.08em}
-    .summary-value{font-size:1.2vw; font-weight:900; line-height:1; text-align:right; margin:0}
-    .summary-note{font-size:.62vw; color:#dce9f7; line-height:1.05; min-height:.7vw}
+    .summary-label{font-size:clamp(14px, .8vw, 18px); color:var(--muted); font-weight:800; text-transform:uppercase; letter-spacing:.08em}
+    .summary-value{font-size:clamp(28px, 1.6vw, 40px); font-weight:900; line-height:1; text-align:right; margin:0}
+    .summary-note{font-size:clamp(14px, .8vw, 18px); color:#dce9f7; line-height:1.2;}
     .summary-note.hidden{visibility:hidden}
 
     .page-info{
@@ -203,7 +202,7 @@
     }
     .store-row.more-stores .store-name{font-size:.82vw; white-space:normal}
     .lsp-inline{display:flex; align-items:baseline; justify-content:space-between; gap:.5vw}
-    .lsp-inline .summary-note{margin:0; min-height:auto; text-align:left}
+    .lsp-inline .summary-note{font-size:clamp(14px, .8vw, 18px); color:#dce9f7; line-height:1.2;}
     .store-id{display:none}
     .store-point,.store-lsp{display:none}
     .store-point-label,.store-lsp-label{display:none}
@@ -270,7 +269,7 @@
     @media (max-width: 1200px){
       .title{font-size:30px}.subtitle{font-size:14px}.logo-box{height:52px;font-size:14px;min-width:150px}
       .meta-label,.summary-label,.page-stat-label,.store-point-label,.store-lsp-label,.store-id{font-size:10px}
-      .meta-value,.page-stat-value{font-size:18px}.summary-value{font-size:28px}.summary-note,.page-banner-sub{font-size:13px}
+      .meta-value,.page-stat-value{font-size:18px}.summary-value{font-size:clamp(28px, 1.6vw, 40px); font-weight:900; line-height:1; text-align:right; margin:0}.summary-note,.page-banner-sub{font-size:13px}
       .summary-head{gap:12px}
       .page-banner-title{font-size:22px}.trip-route{font-size:18px}.trip-count{font-size:16px}
       .store-name,.truck,.badge{font-size:14px}.store-point-value,.store-lsp-value,.store-seq{font-size:13px}
