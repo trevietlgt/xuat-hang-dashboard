@@ -23,7 +23,7 @@
     *{box-sizing:border-box}
     html,body{
       width:100%; height:100%; margin:0; overflow:hidden;
-      font-family: Inter, "Arial", Roboto, Arial, sans-serif;
+      font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
       background: radial-gradient(circle at top right, #14335d 0%, var(--bg) 38%, #030814 100%);
       color:var(--text);
     }
@@ -244,8 +244,8 @@
         <div class="logo-box">Cello Square</div>
         <div class="logo-box small">Samsung SDS</div>
         <div>
-          <div class="title">Outbound Pick Pack Dashboard</div>
-          <div class="subtitle">TV mode · gộp cửa hàng theo trip · tự lật trang</div>
+          <div class="title">Outbound Dashboard</div>
+          
         </div>
       </div>
       <div class="meta">
@@ -594,7 +594,7 @@
       const head = document.createElement('div');
       head.className = 'trip-headline';
       head.innerHTML =
-        '<div class="trip-route">Điểm dừng và tên cửa hàng</div>';
+        '<div class="trip-route"></div>';
 
       const list = document.createElement('div');
       list.className = 'store-list';
@@ -775,13 +775,13 @@
       try {
         const items = await fetchGoogleSheetViaGviz();
         renderDashboard(items, 'Google Sheet trực tiếp');
-        setStatus('Đồng bộ OK', 'ok');
+        setStatus(' Đồng bộ OK', 'ok');
       } catch (gvizErr) {
         console.warn('GViz lỗi, thử CSV export...', gvizErr);
         try {
           const csvText = await fetchCsvText(CSV_URL + '&t=' + Date.now());
           renderFromCsvText(csvText, 'Google Sheet CSV export');
-          setStatus('Đồng bộ OK', 'ok');
+          setStatus(' Đồng bộ OK', 'ok');
         } catch (csvErr) {
           console.error(csvErr);
           useSampleData((csvErr && csvErr.message) || (gvizErr && gvizErr.message) || 'Lỗi tải dữ liệu');
