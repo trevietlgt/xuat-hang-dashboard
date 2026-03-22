@@ -70,14 +70,18 @@
       gap:.28vw;
     }
     .summary-card{
-      border:1px solid var(--line); border-radius:.85vw; padding:.45vw .62vw;
+      border:1px solid var(--line); border-radius:.85vw; padding:.38vw .62vw;
       background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.025));
       box-shadow:var(--shadow);
-      min-height:5.8vh;
+      min-height:4.6vh;
+      display:grid;
+      grid-template-rows:auto auto;
+      gap:.12vw;
     }
+    .summary-head{display:flex; align-items:baseline; justify-content:space-between; gap:.5vw}
     .summary-label{font-size:.58vw; color:var(--muted); font-weight:800; text-transform:uppercase; letter-spacing:.08em}
-    .summary-value{font-size:1.2vw; font-weight:900; margin-top:.1vw; line-height:1}
-    .summary-note{font-size:.62vw; color:#dce9f7; margin-top:.08vw}
+    .summary-value{font-size:1.2vw; font-weight:900; line-height:1; text-align:right; margin:0}
+    .summary-note{font-size:.62vw; color:#dce9f7; line-height:1.05; min-height:.7vw}
     .summary-note.hidden{visibility:hidden}
 
     .page-info{
@@ -111,8 +115,8 @@
     .trip-grid{
       display:grid;
       grid-template-columns:repeat(3, 1fr);
-      grid-template-rows:repeat(1, 1fr);
-      gap:.4vw;
+      grid-template-rows:repeat(2, 1fr);
+      gap:.8vw;
       height:100%;
       min-height:0;
     }
@@ -129,14 +133,14 @@
     }
 
     .trip-top{
-      display:grid; grid-template-columns:auto auto auto auto 1fr auto; gap:.34vw; align-items:center;
+      display:grid; grid-template-columns:auto auto auto 1fr auto; gap:.34vw; align-items:center;
     }
     .badge{
       border-radius:.55vw; padding:.34vw .56vw; font-weight:900; line-height:1;
       font-size:.76vw; text-transform:uppercase; white-space:nowrap;
     }
     .badge.trip{background:rgba(41,182,246,.14); color:#a8e5ff; border:1px solid rgba(41,182,246,.28)}
-    .badge.time{background:rgba(122,240,160,.12); color:#bdf7cd; border:1px solid rgba(122,240,160,.26)}
+    .badge.time{background:linear-gradient(180deg, rgba(122,240,160,.20), rgba(122,240,160,.10)); color:#d8ffe4; border:1px solid rgba(122,240,160,.34); font-size:.92vw; padding:.38vw .72vw; box-shadow:0 0 14px rgba(122,240,160,.12)}
     .trip-card.afternoon .badge.time{background:rgba(255,190,92,.12); color:#ffe0a3; border:1px solid rgba(255,190,92,.25)}
     .truck{justify-self:end; font-size:.92vw; color:#d7e7f7; font-weight:800}
 
@@ -181,6 +185,8 @@
       font-size:1.28vw; font-weight:900; line-height:1.06;
       white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     }
+    .lsp-inline{display:flex; align-items:baseline; justify-content:space-between; gap:.5vw}
+    .lsp-inline .summary-note{margin:0; min-height:auto; text-align:left}
     .store-id{display:none}
     .store-point,.store-lsp{display:none}
     .store-point-label,.store-lsp-label{display:none}
@@ -225,6 +231,7 @@
       .title{font-size:30px}.subtitle{font-size:14px}.logo-box{height:52px;font-size:14px;min-width:150px}
       .meta-label,.summary-label,.page-stat-label,.store-point-label,.store-lsp-label,.store-id{font-size:10px}
       .meta-value,.page-stat-value{font-size:18px}.summary-value{font-size:28px}.summary-note,.page-banner-sub{font-size:13px}
+      .summary-head{gap:12px}
       .page-banner-title{font-size:22px}.trip-route{font-size:18px}.trip-count{font-size:16px}
       .store-name,.truck,.badge{font-size:14px}.store-point-value,.store-lsp-value,.store-seq{font-size:13px}
     }
@@ -259,28 +266,38 @@
 
     <section class="summary-row">
       <div class="summary-card">
-        <div class="summary-label">Tổng điểm giao</div>
-        <div id="totalStops" class="summary-value">0</div>
+        <div class="summary-head">
+          <div class="summary-label">Tổng điểm giao</div>
+          <div id="totalStops" class="summary-value">0</div>
+        </div>
         <div class="summary-note">Tổng số cửa hàng cần pick pack</div>
       </div>
       <div class="summary-card">
-        <div class="summary-label">Tổng chuyến</div>
-        <div id="totalTrips" class="summary-value">0</div>
+        <div class="summary-head">
+          <div class="summary-label">Tổng chuyến</div>
+          <div id="totalTrips" class="summary-value">0</div>
+        </div>
         <div class="summary-note">Đếm theo Trip No.</div>
       </div>
       <div class="summary-card">
-        <div class="summary-label">Ca sáng</div>
-        <div id="morningCount" class="summary-value">0</div>
+        <div class="summary-head">
+          <div class="summary-label">Ca sáng</div>
+          <div id="morningCount" class="summary-value">0</div>
+        </div>
         <div class="summary-note hidden">&nbsp;</div>
       </div>
       <div class="summary-card">
-        <div class="summary-label">Ca chiều</div>
-        <div id="afternoonCount" class="summary-value">0</div>
+        <div class="summary-head">
+          <div class="summary-label">Ca chiều</div>
+          <div id="afternoonCount" class="summary-value">0</div>
+        </div>
         <div class="summary-note hidden">&nbsp;</div>
       </div>
       <div class="summary-card">
-        <div class="summary-label">Đối tác vận chuyển</div>
-        <div id="lspCount" class="summary-value">0</div>
+        <div class="summary-head">
+          <div class="summary-label">Đối tác vận chuyển</div>
+          <div id="lspCount" class="summary-value">0</div>
+        </div>
         <div class="summary-note"><span id="lspList">-</span></div>
       </div>
     </section>
@@ -552,7 +569,7 @@
       row.innerHTML =
         '<div class="store-seq">STOP ' + escapeHtml(index + 1) + '</div>' +
         '<div class="store-main">' +
-          '<div class="store-name">' + escapeHtml((store.deliveryPoint ? store.deliveryPoint + ' · ' : '') + (store.storeName || '-')) + '</div>' +
+          '<div class="store-name">' + escapeHtml(store.storeName || '-') + '</div>' +
         '</div>';
       return row;
     }
@@ -568,9 +585,8 @@
       const top = document.createElement('div');
       top.className = 'trip-top';
       top.innerHTML =
-        '<span class="badge trip">Trip ' + escapeHtml(trip.tripNo) + '</span>' +
-        '<span class="badge meta-inline">LSP ' + escapeHtml(trip.lsp || '-') + '</span>' +
         '<span class="badge time">Xuất hàng ' + escapeHtml(trip.pickupTime) + '</span>' +
+        '<span class="badge meta-inline">LSP ' + escapeHtml(trip.lsp || '-') + '</span>' +
         '<span class="badge meta-inline">' + escapeHtml(trip.stores.length) + ' cửa hàng</span>' +
         '<div></div>' +
         '<div class="truck">' + escapeHtml(trip.truckType || '-') + '</div>';
