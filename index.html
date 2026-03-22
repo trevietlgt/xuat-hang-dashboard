@@ -119,20 +119,21 @@
       display:grid;
       grid-template-columns:repeat(4, 1fr);
       grid-template-rows:1fr;
-      gap:clamp(8px, .4vw, 14px);
-      align-items:start;
+      gap:clamp(10px, .5vw, 16px);
+      align-items:stretch;
+      height:100%;
     }
 
     .trip-card{
       border:1px solid rgba(255,255,255,.08);
       border-radius:1vw;
       background:linear-gradient(180deg, rgba(17,35,59,.98), rgba(11,25,44,.98));
-      padding:clamp(8px, .34vw, 12px) clamp(10px, .4vw, 14px);
+      padding:clamp(10px, .4vw, 14px);
       display:flex;
       flex-direction:column;
-      align-self:start;
-      height:auto;
-      min-height:0;
+      justify-content:flex-start;
+      height:100%;
+      overflow:hidden;
     }
 
     .trip-top{
@@ -308,22 +309,22 @@
 .grid-panel{
   padding:6px;
 }
-.trip-card[data-store-count="1"]{min-height:180px}
-.trip-card[data-store-count="2"]{min-height:230px}
-.trip-card[data-store-count="3"]{min-height:280px}
-.trip-card[data-store-count="4"]{min-height:330px}
-.trip-card[data-store-count="5"]{min-height:380px}
-.trip-card[data-store-count="6"]{min-height:430px}
+
+
+
+
+
+
 .trip-empty{
   min-height:180px;
 }
 @media (min-width: 1920px){
-  .trip-card[data-store-count="1"]{min-height:190px}
-  .trip-card[data-store-count="2"]{min-height:245px}
-  .trip-card[data-store-count="3"]{min-height:300px}
-  .trip-card[data-store-count="4"]{min-height:355px}
-  .trip-card[data-store-count="5"]{min-height:410px}
-  .trip-card[data-store-count="6"]{min-height:465px}
+  
+  
+  
+  
+  
+  
 }
 </style>
 <script>
@@ -1016,4 +1017,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <style>
 .trip-card.morning{min-height:0;}
+</style>
+
+<style>
+.store-list{
+  overflow:hidden;
+}
+
+.trip-card{
+  max-height:100%;
+}
+
+.store-list{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  flex:1;
+}
 </style>
