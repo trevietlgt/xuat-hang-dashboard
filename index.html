@@ -114,7 +114,7 @@
 
     .trip-grid{
       display:grid;
-      grid-template-columns:repeat(3, 1fr);
+      grid-template-columns:repeat(2, 1fr);
       grid-template-rows:repeat(2, 1fr);
       gap:.8vw;
       height:100%;
@@ -160,35 +160,33 @@
     .store-list{
       min-height:0;
       display:grid;
-      grid-template-columns:repeat(4, minmax(0, 1fr));
-      grid-template-rows:repeat(2, minmax(0, auto));
-      gap:.32vw;
+      grid-template-columns:1fr;
+      gap:.22vw;
       align-content:start;
     }
 
     .store-row{
       display:grid;
-      grid-template-rows:auto 1fr;
-      gap:.18vw;
-      align-items:start;
+      grid-template-columns:auto 1fr;
+      gap:.38vw;
+      align-items:center;
       border:1px solid rgba(255,255,255,.06);
       background:rgba(255,255,255,.03);
       border-radius:.68vw;
       padding:.34vw .44vw;
       min-width:0;
-      min-height:3.45vw;
+      min-height:0;
     }
     .store-seq{
       font-size:.7vw; font-weight:900; color:#9de7ff; text-transform:uppercase;
       background:rgba(41,182,246,.12); border:1px solid rgba(41,182,246,.22);
       border-radius:.42vw; padding:.16vw .3vw; text-align:center;
-      width:max-content; min-width:3vw;
+      width:3.4vw; min-width:3.4vw;
     }
     .store-main{min-width:0}
     .store-name{
       font-size:.9vw; font-weight:900; line-height:1.05;
-      display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
-      word-break:break-word;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     }
     .store-row.more-stores{
       display:flex;
@@ -198,7 +196,7 @@
       background:rgba(255,202,92,.08);
       border:1px dashed rgba(255,202,92,.26);
     }
-    .store-row.more-stores .store-name{font-size:.82vw; -webkit-line-clamp:3}
+    .store-row.more-stores .store-name{font-size:.82vw; white-space:normal}
     .lsp-inline{display:flex; align-items:baseline; justify-content:space-between; gap:.5vw}
     .lsp-inline .summary-note{margin:0; min-height:auto; text-align:left}
     .store-id{display:none}
@@ -271,7 +269,7 @@
       .summary-head{gap:12px}
       .page-banner-title{font-size:22px}.trip-route{font-size:18px}.trip-count{font-size:16px}
       .store-name,.truck,.badge{font-size:14px}.store-point-value,.store-lsp-value,.store-seq{font-size:13px}
-      .store-list{grid-template-columns:repeat(2, minmax(0, 1fr)); grid-template-rows:auto}
+      .store-list{grid-template-columns:1fr}
     }
   </style>
 </head>
@@ -366,7 +364,7 @@
     <section class="footer">
       <div id="footerSource">Nguồn dữ liệu: Google Sheet trực tiếp · tự làm mới mỗi 60 giây</div>
       <div class="status-inline">
-        <span>Hiển thị 6 trip / trang · tối đa 8 cửa hàng / trip</span>
+        <span>Hiển thị 4 trip / trang · tối đa 6 cửa hàng / trip</span>
         <span>•</span>
         <span>Auto flip</span>
       </div>
@@ -382,7 +380,7 @@
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/export?format=csv&gid=' + SHEET_GID;
     const REFRESH_MS = 60000;
     const PAGE_FLIP_MS = 12000;
-    const TRIPS_PER_PAGE = 6;
+    const TRIPS_PER_PAGE = 4;
     const ANIMATION_MS = 700;
     const TZ = 'Asia/Bangkok';
 
@@ -652,7 +650,7 @@
 
       const list = document.createElement('div');
       list.className = 'store-list';
-      const maxVisibleStores = 8;
+      const maxVisibleStores = 6;
       const renderStores = trip.stores.length > maxVisibleStores
         ? trip.stores.slice(0, maxVisibleStores - 1)
         : trip.stores.slice(0, maxVisibleStores);
