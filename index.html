@@ -406,7 +406,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="logo-box">Cello Square</div>
         <div class="logo-box small">Samsung SDS</div>
         <div>
-          <div class="title">Outbound Pick Pack Dashboard</div>
+          <div class="title">OUTBOUND PLAN DASHBOARD</div>
           
         </div>
       </div>
@@ -429,7 +429,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <section class="summary-row">
       <div class="summary-card">
         <div class="summary-head">
-          <div class="summary-label">Tổng điểm giao</div>
+          <div class="summary-label">Tổng số cửa hàng</div>
           <div id="totalStops" class="summary-value">0</div>
         </div>
         <div class="summary-note hidden">&nbsp;</div>
@@ -457,7 +457,7 @@ document.addEventListener('DOMContentLoaded', () => {
       </div>
       <div class="summary-card">
         <div class="summary-head">
-          <div class="summary-label">Đối tác vận chuyển</div>
+          <div class="summary-label">LSP</div>
           <div id="lspCount" class="summary-value">0</div>
         </div>
         <div class="summary-note"><span id="lspList">-</span></div>
@@ -743,8 +743,8 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       return {
-        pages: paginateTrips(morningTrips, 'morning', 'Ca sáng').concat(
-          paginateTrips(afternoonTrips, 'afternoon', 'Ca chiều')
+        pages: paginateTrips(morningTrips, 'morning', 'Số chuyến Ca sáng').concat(
+          paginateTrips(afternoonTrips, 'afternoon', 'Số chuyến Ca chiều')
         ),
         morningTrips: morningTrips,
         afternoonTrips: afternoonTrips
