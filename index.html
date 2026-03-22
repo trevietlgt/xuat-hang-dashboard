@@ -137,13 +137,13 @@
       display:grid; grid-template-columns:auto auto auto 1fr auto; gap:.24vw; align-items:center;
     }
     .badge{
-      border-radius:.55vw; padding:.34vw .56vw; font-weight:900; line-height:1;
-      font-size:.64vw; text-transform:uppercase; white-space:nowrap;
+      border-radius:.55vw; padding:clamp(6px, .30vw, 9px) clamp(10px, .48vw, 16px); font-weight:900; line-height:1;
+      font-size:clamp(15px, .82vw, 20px); text-transform:uppercase; white-space:nowrap;
     }
     .badge.trip{background:rgba(41,182,246,.14); color:#a8e5ff; border:1px solid rgba(41,182,246,.28)}
-    .badge.time{background:linear-gradient(180deg, rgba(122,240,160,.20), rgba(122,240,160,.10)); color:#d8ffe4; border:1px solid rgba(122,240,160,.34); font-size:.76vw; padding:.28vw .48vw; box-shadow:0 0 14px rgba(122,240,160,.12)}
+    .badge.time{background:linear-gradient(180deg, rgba(122,240,160,.20), rgba(122,240,160,.10)); color:#d8ffe4; border:1px solid rgba(122,240,160,.34); font-size:clamp(20px, 1.18vw, 28px); padding:clamp(6px, .28vw, 10px) clamp(12px, .56vw, 18px); box-shadow:0 0 14px rgba(122,240,160,.12)}
     .trip-card.afternoon .badge.time{background:rgba(255,190,92,.12); color:#ffe0a3; border:1px solid rgba(255,190,92,.25)}
-    .truck{justify-self:end; font-size:.76vw; color:#d7e7f7; font-weight:900}
+    .truck{justify-self:end; font-size:clamp(16px, .92vw, 22px); color:#d7e7f7; font-weight:900}
 
     .trip-headline{
       display:block;
@@ -167,30 +167,30 @@
 
     .store-row {
   display:grid;
-  grid-template-columns:100px 1fr;
+  grid-template-columns:112px 1fr;
   align-items:center;
-  gap:10px;
-  padding:6px 10px;
+  gap:12px;
+  padding:8px 12px;
 }
     .store-seq {
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size: clamp(16px, 1vw, 24px);
+  font-size: clamp(20px, 1.18vw, 28px);
   font-weight:900;
   color:#9de7ff;
   text-transform:uppercase;
   background:rgba(41,182,246,.15);
   border:1px solid rgba(41,182,246,.35);
   border-radius:12px;
-  padding:6px 10px;
-  min-width:90px;
+  padding:8px 12px;
+  min-width:104px;
   height:100%;
   white-space:nowrap;
 }
     .store-main{min-width:0}
     .store-name{
-      font-size:.50vw; font-weight:900; line-height:1;
+      font-size:clamp(21px, 1.24vw, 29px); font-weight:900; line-height:1.1;
       white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     }
     .store-row.more-stores{
