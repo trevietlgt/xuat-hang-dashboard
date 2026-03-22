@@ -157,7 +157,7 @@
     }
 
     .store-row{
-      display:grid; grid-template-columns:4.4vw 1fr 5.2vw 4.4vw;
+      display:grid; grid-template-columns:4.4vw 1fr 4.4vw;
       gap:.45vw;
       align-items:center;
       border:1px solid rgba(255,255,255,.06);
@@ -535,24 +535,21 @@
     }
 
     function createStoreRow(store, index) {
-      const row = document.createElement('div');
-      row.className = 'store-row';
-      row.innerHTML =
-        '<div class="store-seq">Stop ' + escapeHtml(index + 1) + '</div>' +
-        '<div class="store-main">' +
-          '<div class="store-name">' + escapeHtml(store.storeName || '-') + '</div>' +
-          '<div class="store-id">Store ID: ' + escapeHtml(store.storeId || '-') + '</div>' +
-        '</div>' +
-        '<div class="store-point">' +
-          '<div class="store-point-label">Điểm giao</div>' +
-          '<div class="store-point-value">' + escapeHtml(store.deliveryPoint || '-') + '</div>' +
-        '</div>' +
-        '<div class="store-lsp">' +
-          '<div class="store-lsp-label">LSP</div>' +
-          '<div class="store-lsp-value">' + escapeHtml(store.lsp || '-') + '</div>' +
-        '</div>';
-      return row;
-    }
+  const row = document.createElement('div');
+  row.className = 'store-row';
+
+  row.innerHTML =
+    '<div class="store-seq">Stop ' + (index + 1) + '</div>' +
+    '<div class="store-main">' +
+      '<div class="store-name">' + escapeHtml(store.storeName || '-') + '</div>' +
+    '</div>' +
+    '<div class="store-lsp">' +
+      '<div class="store-lsp-label">LSP</div>' +
+      '<div class="store-lsp-value">' + escapeHtml(store.lsp || '-') + '</div>' +
+    '</div>';
+
+  return row;
+}
 
     function createTripCard(trip, periodKey) {
       const card = document.createElement('article');
