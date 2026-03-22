@@ -309,7 +309,7 @@
     </section>
 
     <section class="footer">
-      <div id="footerSource">Nguồn dữ liệu: Google Sheets Published CSV · tự làm mới mỗi 60 giây</div>
+      <div id="footerSource">Nguồn dữ liệu: Google Sheet trực tiếp · tự làm mới mỗi 60 giây</div>
       <div class="status-inline">
         <span>Hiển thị 4 trip / trang</span>
         <span>•</span>
@@ -318,8 +318,11 @@
     </section>
   </div>
 
+  <script src="https://www.gstatic.com/charts/loader.js"></script>
   <script>
-    const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSQfyrmniG35M9Hi7VBR_ZDjRlRwc7te3tx1upvWbCsIA2MESeRkp6Wx7zZr_VUflPupi-rbnGFbgM1/pub?gid=358090930&single=true&output=csv';
+    const SHEET_ID = '15Jtivb-WUwwTUYTN6pbV3cPzGQ1-fqku93RaKiLzCS8';
+    const SHEET_GID = '358090930';
+    const CSV_URL = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/export?format=csv&gid=' + SHEET_GID;
     const REFRESH_MS = 60000;
     const PAGE_FLIP_MS = 12000;
     const TRIPS_PER_PAGE = 4;
@@ -700,16 +703,73 @@
       console.warn(reason || 'Không truy cập được Google Sheets từ môi trường hiện tại');
     }
 
+    function rowsFromGoogleTable(table) {
+      const rows = [];
+      const colCount = table.getNumberOfColumns();
+      const rowCount = table.getNumberOfRows();
+      const headers = [];
+
+      for (let c = 0; c < colCount; c++) {
+        headers.push(String(table.getColumnLabel(c) || table.getColumnId(c) || '').trim());
+      }
+      rows.push(headers);
+
+      for (let r = 0; r < rowCount; r++) {
+        const row = [];
+        for (let c = 0; c < colCount; c++) {
+          const formatted = table.getFormattedValue(r, c);
+          const raw = table.getValue(r, c);
+          row.push(String(formatted != null && formatted !== '' ? formatted : (raw != null ? raw : '')).trim());
+        }
+        rows.push(row);
+      }
+      return rows;
+    }
+
+    function fetchGoogleSheetViaGviz() {
+      return new Promise(function(resolve, reject){
+        if (!window.google || !google.charts || !google.visualization) {
+          reject(new Error('Google Charts chưa sẵn sàng'));
+          return;
+        }
+
+        const url = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?gid=' + SHEET_GID + '&headers=1&tqx=' + encodeURIComponent('out:json');
+        const query = new google.visualization.Query(url);
+        query.send(function(response){
+          if (response.isError()) {
+            reject(new Error(response.getMessage() || 'Lỗi truy vấn Google Visualization'));
+            return;
+          }
+          try {
+            const table = response.getDataTable();
+            const rows = rowsFromGoogleTable(table);
+            const items = mapRows(rows);
+            if (!items.length) throw new Error('Không tìm thấy dòng dữ liệu hợp lệ từ Google Sheet');
+            resolve(items);
+          } catch (err) {
+            reject(err);
+          }
+        });
+      });
+    }
+
     async function loadRemoteData() {
       setStatus('Đang tải', 'warn');
       els.lastUpdated.textContent = formatNow();
       try {
-        const csvText = await fetchCsvText(CSV_URL + '&t=' + Date.now());
-        renderFromCsvText(csvText, 'Google Sheets Published CSV');
+        const items = await fetchGoogleSheetViaGviz();
+        renderDashboard(items, 'Google Sheet trực tiếp');
         setStatus('Đồng bộ OK', 'ok');
-      } catch (err) {
-        console.error(err);
-        useSampleData(err && err.message ? err.message : 'Lỗi tải dữ liệu');
+      } catch (gvizErr) {
+        console.warn('GViz lỗi, thử CSV export...', gvizErr);
+        try {
+          const csvText = await fetchCsvText(CSV_URL + '&t=' + Date.now());
+          renderFromCsvText(csvText, 'Google Sheet CSV export');
+          setStatus('Đồng bộ OK', 'ok');
+        } catch (csvErr) {
+          console.error(csvErr);
+          useSampleData((csvErr && csvErr.message) || (gvizErr && gvizErr.message) || 'Lỗi tải dữ liệu');
+        }
       }
     }
 
@@ -748,8 +808,11 @@
 
     runTests();
     useSampleData('Khởi tạo an toàn trước khi thử kết nối từ xa');
-    loadRemoteData();
-    scheduleRefresh();
+    google.charts.load('current', { packages:['table'] });
+    google.charts.setOnLoadCallback(function(){
+      loadRemoteData();
+      scheduleRefresh();
+    });
   </script>
 </body>
 </html>
