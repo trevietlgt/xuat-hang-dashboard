@@ -316,19 +316,18 @@
   </div>
 
   <script>
-    const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSQfyrmniG35M9Hi7VBR_ZDjRlRwc7te3tx1upvWbCsIA2MESeRkp6Wx7zZr_VUflPupi-rbnGFbgM1/pub?gid=358090930&single=true&output=csv';
+    const SHEET_ID = '15Jtivb-WUwwTUYTN6pbV3cPzGQ1-fqku93RaKiLzCS8';
+    const GID = '358090930';
+    const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}`;
     const REFRESH_MS = 60_000;
     const TZ = 'Asia/Bangkok';
 
     const SAMPLE_CSV = `DATE,TRIP NO.,PICKUP TIME (PLAN),TRUCK TYPE,STORE ID,STORE NAME,DELIVERY POINT,LSP
 23/03/2026,1,08:00,4W,1001,MM Mega Market An Phú,12,Samsung SDS
-23/03/2026,1,08:00,4W,1007,MM Mega Market Thủ Đức,5,Samsung SDS
 23/03/2026,2,09:30,4W,1002,MM Mega Market Bình Phú,8,Samsung SDS
 23/03/2026,3,11:15,2T,1003,MM Mega Market Hiệp Phú,6,Cello Square
-23/03/2026,3,11:15,2T,1008,MM Mega Market Gò Vấp,4,Cello Square
 23/03/2026,4,13:30,4W,1004,MM Mega Market Hà Đông,10,Cello Square
 23/03/2026,5,15:00,2T,1005,MM Mega Market Long Biên,7,Samsung SDS
-23/03/2026,5,15:00,2T,1009,MM Mega Market Thanh Xuân,3,Samsung SDS
 23/03/2026,6,17:00,4W,1006,MM Mega Market Thăng Long,9,Cello Square`;
 
     const els = {
@@ -443,8 +442,7 @@
 
     function mapRows(rows) {
       const { data } = pickHeaderAndRows(rows);
-      return data.map((r, index) => ({
-        rowIndex: index,
+      return data.map(r => ({
         date: (r[0] || '').trim(),
         tripNo: (r[1] || '').trim(),
         pickupTime: (r[2] || '').trim(),
@@ -454,43 +452,15 @@
         deliveryPoint: (r[6] || '').trim(),
         lsp: (r[7] || '').trim()
       }))
-      .filter(x => x.tripNo && x.pickupTime && (x.storeName || x.storeId));
-    }
-
-    function groupTrips(items) {
-      const trips = [];
-      const tripMap = new Map();
-
-      items.forEach(item => {
-        const key = String(item.tripNo).trim();
-        if (!tripMap.has(key)) {
-          const group = {
-            tripNo: item.tripNo,
-            pickupTime: item.pickupTime,
-            truckType: item.truckType,
-            lsp: item.lsp,
-            date: item.date,
-            firstRowIndex: item.rowIndex,
-            firstPickupTotal: parseHourMinute(item.pickupTime)?.total ?? 9999,
-            stores: []
-          };
-          tripMap.set(key, group);
-          trips.push(group);
-        }
-
-        const group = tripMap.get(key);
-        group.stores.push({
-          storeId: item.storeId,
-          storeName: item.storeName,
-          deliveryPoint: item.deliveryPoint,
-          lsp: item.lsp,
-          truckType: item.truckType,
-          pickupTime: item.pickupTime,
-          rowIndex: item.rowIndex
-        });
+      .filter(x => x.tripNo && x.pickupTime && (x.storeName || x.storeId))
+      .sort((a,b) => {
+        const ta = parseHourMinute(a.pickupTime)?.total ?? 9999;
+        const tb = parseHourMinute(b.pickupTime)?.total ?? 9999;
+        if (ta !== tb) return ta - tb;
+        const na = Number(a.deliveryPoint) || 0;
+        const nb = Number(b.deliveryPoint) || 0;
+        return nb - na;
       });
-
-      return trips;
     }
 
     function escapeHtml(str='') {
@@ -505,24 +475,6 @@
     function createCard(item) {
       const wrap = document.createElement('article');
       wrap.className = 'trip-card';
-
-      const storeRows = item.stores.map((store, index) => `
-        <div class="detail-grid">
-          <div class="detail">
-            <div class="label">Stop ${index + 1}</div>
-            <div class="value">${escapeHtml(store.storeName || store.storeId || '-')}</div>
-          </div>
-          <div class="detail">
-            <div class="label">Store ID</div>
-            <div class="value">${escapeHtml(store.storeId || '-')}</div>
-          </div>
-          <div class="detail">
-            <div class="label">Delivery Point</div>
-            <div class="value">${escapeHtml(store.deliveryPoint || '-')}</div>
-          </div>
-        </div>
-      `).join('');
-
       wrap.innerHTML = `
         <div class="trip-top">
           <span class="badge trip">Trip ${escapeHtml(item.tripNo)}</span>
@@ -530,8 +482,21 @@
           <div></div>
           <div class="truck">${escapeHtml(item.truckType || '-')}</div>
         </div>
-        <div class="store-name">${item.stores.length} cửa hàng · ${escapeHtml(item.lsp || '-')}</div>
-        ${storeRows}
+        <div class="store-name">${escapeHtml(item.storeName || item.storeId || '-')}</div>
+        <div class="detail-grid">
+          <div class="detail">
+            <div class="label">Store ID</div>
+            <div class="value">${escapeHtml(item.storeId || '-')}</div>
+          </div>
+          <div class="detail">
+            <div class="label">Delivery Point</div>
+            <div class="value">${escapeHtml(item.deliveryPoint || '-')}</div>
+          </div>
+          <div class="detail">
+            <div class="label">LSP</div>
+            <div class="value">${escapeHtml(item.lsp || '-')}</div>
+          </div>
+        </div>
       `;
       return wrap;
     }
@@ -568,28 +533,26 @@
     }
 
     function renderDashboard(items, sourceLabel='Google Sheets CSV') {
-      const trips = groupTrips(items);
-      const morningTrips = trips.filter(x => (parseHourMinute(x.pickupTime)?.hour ?? 0) < 12);
-      const afternoonTrips = trips.filter(x => (parseHourMinute(x.pickupTime)?.hour ?? 0) >= 12);
+      const morning = items.filter(x => (parseHourMinute(x.pickupTime)?.hour ?? 0) < 12);
+      const afternoon = items.filter(x => (parseHourMinute(x.pickupTime)?.hour ?? 0) >= 12);
+      const uniqueTrips = new Set(items.map(x => x.tripNo).filter(Boolean));
       const lsps = [...new Set(items.map(x => x.lsp).filter(Boolean))];
       const planDate = items[0]?.date || '';
-      const morningStops = morningTrips.reduce((sum, trip) => sum + trip.stores.length, 0);
-      const afternoonStops = afternoonTrips.reduce((sum, trip) => sum + trip.stores.length, 0);
 
       els.planDate.textContent = toDisplayDate(planDate);
       els.lastUpdated.textContent = formatNow();
       els.totalStops.textContent = String(items.length);
-      els.totalTrips.textContent = String(trips.length);
-      els.morningCount.textContent = String(morningTrips.length);
-      els.afternoonCount.textContent = String(afternoonTrips.length);
+      els.totalTrips.textContent = String(uniqueTrips.size);
+      els.morningCount.textContent = String(morning.length);
+      els.afternoonCount.textContent = String(afternoon.length);
       els.lspCount.textContent = String(lsps.length);
       els.lspList.textContent = lsps.join(' · ') || '-';
-      els.morningHeaderCount.textContent = `${morningTrips.length} trip · ${morningStops} điểm giao`;
-      els.afternoonHeaderCount.textContent = `${afternoonTrips.length} trip · ${afternoonStops} điểm giao`;
+      els.morningHeaderCount.textContent = `${morning.length} điểm giao`;
+      els.afternoonHeaderCount.textContent = `${afternoon.length} điểm giao`;
       els.footerSource.textContent = `Nguồn dữ liệu: ${sourceLabel} · Tự làm mới mỗi 60 giây`;
 
-      renderColumn(els.morningTrack, morningTrips, 'Không có dữ liệu ca sáng');
-      renderColumn(els.afternoonTrack, afternoonTrips, 'Không có dữ liệu ca chiều');
+      renderColumn(els.morningTrack, morning, 'Không có dữ liệu ca sáng');
+      renderColumn(els.afternoonTrack, afternoon, 'Không có dữ liệu ca chiều');
     }
 
     async function fetchCsvText(url) {
@@ -623,9 +586,9 @@
       els.lastUpdated.textContent = formatNow();
       try {
         const csvText = await fetchCsvText(`${CSV_URL}&t=${Date.now()}`);
-        renderFromCsvText(csvText, 'Google Sheets Published CSV');
+        renderFromCsvText(csvText, 'Google Sheets CSV');
         setStatus('Đồng bộ OK', 'ok');
-        els.footerHint.textContent = 'Đang lấy dữ liệu trực tiếp từ link publish CSV của Google Sheets.';
+        els.footerHint.textContent = 'Đang lấy dữ liệu trực tiếp từ Google Sheets.';
       } catch (err) {
         console.error(err);
         useSampleData(err && err.message ? err.message : 'Lỗi tải dữ liệu');
@@ -649,12 +612,10 @@
     }
 
     function runTests() {
-      const t1 = csvToRows('A,B
-1,2');
+      const t1 = csvToRows('A,B\n1,2');
       console.assert(t1.length === 2 && t1[1][1] === '2', 'Test csvToRows cơ bản thất bại');
 
-      const t2 = csvToRows('A,B
-"1,1",2');
+      const t2 = csvToRows('A,B\n"1,1",2');
       console.assert(t2[1][0] === '1,1', 'Test csvToRows với dấu phẩy trong quote thất bại');
 
       const t3 = parseHourMinute('01:30 PM');
@@ -663,15 +624,9 @@
       const t4 = parseHourMinute('12:00 AM');
       console.assert(t4 && t4.hour === 0, 'Test parseHourMinute 12AM thất bại');
 
-      const mapped = mapRows(csvToRows(SAMPLE_CSV));
-      console.assert(mapped.length === 9, 'Test mapRows số dòng thất bại');
-      console.assert(mapped[0].tripNo === '1' && mapped[1].tripNo === '1', 'Test giữ nguyên thứ tự Google Sheet thất bại');
-
-      const grouped = groupTrips(mapped);
-      console.assert(grouped.length === 6, 'Test groupTrips số trip thất bại');
-      console.assert(grouped[0].tripNo === '1' && grouped[0].stores.length === 2, 'Test combine cửa hàng cùng trip thất bại');
-      console.assert(grouped[2].tripNo === '3' && grouped[2].stores[1].storeId === '1008', 'Test thứ tự cửa hàng trong trip thất bại');
-      console.assert(grouped[0].stores[0].storeId === '1001' && grouped[0].stores[1].storeId === '1007', 'Test giữ đúng thứ tự cửa hàng theo Google Sheet thất bại');
+      const t5 = mapRows(csvToRows(SAMPLE_CSV));
+      console.assert(t5.length === 6, 'Test mapRows số dòng thất bại');
+      console.assert(t5[0].tripNo === '1', 'Test sort thời gian thất bại');
     }
 
     els.reloadBtn.addEventListener('click', () => {
