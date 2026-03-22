@@ -68,7 +68,7 @@
 
     .summary-row{
       display:grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(5, minmax(0, 1fr));
       gap:clamp(6px, .3vw, 12px);
       align-items:stretch;
     }
@@ -137,16 +137,19 @@
     }
 
     .trip-top{
-      display:grid; grid-template-columns:auto auto auto 1fr auto; gap:.24vw; align-items:center;
+      display:grid;
+      grid-template-columns:minmax(0, 1fr) auto;
+      gap:clamp(8px, .35vw, 14px);
+      align-items:start;
     }
     .badge{
       border-radius:.55vw; padding:clamp(6px, .30vw, 9px) clamp(10px, .48vw, 16px); font-weight:900; line-height:1;
       font-size:clamp(15px, .82vw, 20px); text-transform:uppercase; white-space:nowrap;
     }
     .badge.trip{background:rgba(41,182,246,.14); color:#a8e5ff; border:1px solid rgba(41,182,246,.28)}
-    .badge.time{background:linear-gradient(180deg, rgba(122,240,160,.20), rgba(122,240,160,.10)); color:#d8ffe4; border:1px solid rgba(122,240,160,.34); font-size:clamp(20px, 1.18vw, 28px); padding:clamp(6px, .28vw, 10px) clamp(12px, .56vw, 18px); box-shadow:0 0 14px rgba(122,240,160,.12)}
+    .badge.time{background:linear-gradient(180deg, rgba(122,240,160,.20), rgba(122,240,160,.10)); color:#d8ffe4; border:1px solid rgba(122,240,160,.34); font-size:clamp(24px, 1.35vw, 34px); padding:clamp(7px, .3vw, 10px) clamp(14px, .62vw, 20px); box-shadow:0 0 14px rgba(122,240,160,.12); justify-self:start; max-width:100%; overflow:hidden; text-overflow:ellipsis}
     .trip-card.afternoon .badge.time{background:rgba(255,190,92,.12); color:#ffe0a3; border:1px solid rgba(255,190,92,.25)}
-    .truck{justify-self:end; font-size:clamp(16px, .92vw, 22px); color:#d7e7f7; font-weight:900}
+    .truck{justify-self:end; align-self:start; font-size:clamp(14px, .82vw, 20px); line-height:1.05; color:#d7e7f7; font-weight:900; white-space:nowrap; text-align:right; max-width:82px; overflow:visible}
 
     .trip-headline{
       display:block;
@@ -338,6 +341,12 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
+
+<style>
+.badge.meta-inline{display:none !important;}
+.trip-headline{display:none !important;}
+</style>
+
 </head>
 <body>
   <div class="page">
@@ -491,6 +500,17 @@ document.addEventListener('DOMContentLoaded', () => {
     let flipTimer = null;
     let isFlipPaused = false;
     let pageState = { pages: [], currentIndex: 0 };
+
+
+    function formatTruckType(value) {
+      const raw = String(value || '').trim();
+      if (!raw) return '-';
+      const lower = raw.toLowerCase();
+      if (lower.includes('ton')) return raw;
+      if (/^\d+(\.\d+)?t$/.test(lower)) return raw.slice(0, -1) + ' Ton';
+      if (/^\d+(\.\d+)?$/.test(raw)) return raw + ' Ton';
+      return raw;
+    }
 
     function formatNow() {
       return new Date().toLocaleTimeString('vi-VN', { hour12:false, timeZone: TZ });
@@ -703,11 +723,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const top = document.createElement('div');
       top.className = 'trip-top';
       top.innerHTML =
-        '<span class="badge time">Xuất hàng ' + escapeHtml(trip.pickupTime) + '</span>' +
-        '<span class="badge meta-inline">LSP ' + escapeHtml(trip.lsp || '-') + '</span>' +
-        '<span class="badge meta-inline">' + escapeHtml(trip.stores.length) + ' cửa hàng</span>' +
-        '<div></div>' +
-        '<div class="truck">' + escapeHtml(trip.truckType || '-') + '</div>';
+        '<span class="badge time">Giờ xuất ' + escapeHtml(trip.pickupTime) + '</span>' +
+        '<div class="truck">' + escapeHtml(formatTruckType(trip.truckType || '-')) + '</div>';
 
       const head = document.createElement('div');
       head.className = 'trip-headline';
@@ -1037,16 +1054,7 @@ document.addEventListener('DOMContentLoaded', () => {
 </style>
 
 <style>
-/* Không tách riêng ca sáng/ca chiều ở slide */
-.summary-row .summary-card:nth-child(3),
-.summary-row .summary-card:nth-child(4){
-  display:none !important;
-}
 
-/* Giữ layout summary gọn */
-.summary-row{
-  grid-template-columns: repeat(3, 1fr) !important;
-}
 
 /* 4 cột mỗi màn hình */
 .trip-grid{
@@ -1059,11 +1067,7 @@ document.addEventListener('DOMContentLoaded', () => {
 }
 
 /* Ẩn nhãn ca sáng/ca chiều ở banner */
-.page-banner-sub{
-  visibility:hidden;
-  height:0;
-  margin:0;
-}
+.page-banner-sub{font-size:clamp(11px, .64vw, 14px); color:var(--muted); margin-top:.06vw; font-weight:700}
 
 /* card fit đều màn hình */
 .trip-card{
