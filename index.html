@@ -117,21 +117,21 @@
 
     .trip-grid{
       display:grid;
-      grid-template-columns:repeat(3, 1fr);
-      grid-template-rows:repeat(2, 1fr);
-      gap:.5vw;
-      height:100%;
-      min-height:0;
+      grid-template-columns:repeat(4, 1fr);
+      grid-template-rows:1fr;
+      gap:clamp(8px, .4vw, 14px);
+      align-items:start;
     }
 
     .trip-card{
       border:1px solid rgba(255,255,255,.08);
       border-radius:1vw;
       background:linear-gradient(180deg, rgba(17,35,59,.98), rgba(11,25,44,.98));
-      padding:.42vw .48vw;
-      display:grid;
-      grid-template-rows:auto 1fr;
-      gap:.14vw;
+      padding:clamp(8px, .34vw, 12px) clamp(10px, .4vw, 14px);
+      display:flex;
+      flex-direction:column;
+      align-self:start;
+      height:auto;
       min-height:0;
     }
 
@@ -160,12 +160,12 @@
     }
     .badge.meta-inline{background:rgba(255,255,255,.06); color:#eef6ff; border:1px solid rgba(255,255,255,.12)}
 
-    .store-list {
-  min-height:0;
-  display:grid;
-  grid-template-columns:1fr;
-  gap:6px;
-}
+    .store-list{
+      min-height:0;
+      display:grid;
+      grid-template-columns:1fr;
+      gap:8px;
+    }
 
     .store-row {
   display:grid;
@@ -300,6 +300,43 @@
 }
 
 </style>
+
+<style>
+.board{
+  overflow:hidden;
+}
+.grid-panel{
+  padding:6px;
+}
+.trip-card[data-store-count="1"]{min-height:180px}
+.trip-card[data-store-count="2"]{min-height:230px}
+.trip-card[data-store-count="3"]{min-height:280px}
+.trip-card[data-store-count="4"]{min-height:330px}
+.trip-card[data-store-count="5"]{min-height:380px}
+.trip-card[data-store-count="6"]{min-height:430px}
+.trip-empty{
+  min-height:180px;
+}
+@media (min-width: 1920px){
+  .trip-card[data-store-count="1"]{min-height:190px}
+  .trip-card[data-store-count="2"]{min-height:245px}
+  .trip-card[data-store-count="3"]{min-height:300px}
+  .trip-card[data-store-count="4"]{min-height:355px}
+  .trip-card[data-store-count="5"]{min-height:410px}
+  .trip-card[data-store-count="6"]{min-height:465px}
+}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const cards = document.querySelectorAll('.trip-card');
+  cards.forEach(card => {
+    const storeRows = card.querySelectorAll('.store-row:not(.more-stores)');
+    const count = Math.min(storeRows.length, 6);
+    card.setAttribute('data-store-count', String(count || 1));
+  });
+});
+</script>
+
 </head>
 <body>
   <div class="page">
@@ -978,7 +1015,5 @@
 </style>
 
 <style>
-.trip-card.morning{
-  min-height: 420px;
-}
+.trip-card.morning{min-height:0;}
 </style>
