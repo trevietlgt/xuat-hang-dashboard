@@ -23,8 +23,11 @@
     *{box-sizing:border-box}
     html,body{
       width:100%; height:100%; margin:0; overflow:hidden;
-      font-family: Arial, "Arial Bold", "Helvetica Neue", sans-serif;
+      font-family:"Segoe UI", "Helvetica Neue", Arial, Tahoma, sans-serif;
       font-weight:700;
+      text-rendering:optimizeLegibility;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
       background: radial-gradient(circle at top right, #14335d 0%, var(--bg) 38%, #030814 100%);
       color:var(--text);
     }
@@ -37,8 +40,8 @@
 
     .topbar{
       display:grid; grid-template-columns: 1.3fr auto; align-items:center;
-      gap:.28vw;
-      padding:.4vw .62vw;
+      gap:clamp(6px,.28vw,10px);
+      padding:clamp(8px,.42vw,12px) clamp(10px,.62vw,16px);
       border:1px solid var(--line);
       border-radius:1.2vw;
       background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
@@ -71,7 +74,7 @@
       gap:.28vw;
     }
     .summary-card{
-      border:1px solid var(--line); border-radius:.85vw; padding:.28vw .48vw;
+      border:1px solid var(--line); border-radius:.85vw; padding:.38vw .62vw;
       background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.025));
       box-shadow:var(--shadow);
       min-height:4.6vh;
@@ -94,19 +97,19 @@
       border:1px solid var(--line); border-radius:1vw;
       background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.025));
       box-shadow:var(--shadow);
-      padding:.34vw .48vw;
+      padding:.48vw .62vw;
     }
-    .page-banner-title{font-size:.9vw; font-weight:900; text-transform:uppercase}
-    .page-banner-sub{font-size:.64vw; color:var(--muted); margin-top:.06vw; font-weight:700}
-    .page-stat-label{font-size:.52vw; color:var(--muted); font-weight:800; text-transform:uppercase; letter-spacing:.08em}
-    .page-stat-value{font-size:.88vw; font-weight:900; margin-top:.04vw}
+    .page-banner-title{font-size:clamp(18px,1.08vw,24px); font-weight:900; text-transform:uppercase}
+    .page-banner-sub{font-size:clamp(11px,.68vw,14px); color:var(--muted); margin-top:.06vw; font-weight:700}
+    .page-stat-label{font-size:clamp(10px,.54vw,12px); color:var(--muted); font-weight:800; text-transform:uppercase; letter-spacing:.08em}
+    .page-stat-value{font-size:clamp(15px,.95vw,20px); font-weight:900; margin-top:.06vw}
 
     .board{
       position:relative;
       border:1px solid var(--line); border-radius:1.2vw;
       background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.025));
       box-shadow:var(--shadow);
-      padding:.36vw;
+      padding:clamp(6px,.34vw,10px);
       min-height:0;
       overflow:hidden;
     }
@@ -117,7 +120,7 @@
       display:grid;
       grid-template-columns:repeat(3, 1fr);
       grid-template-rows:repeat(2, 1fr);
-      gap:.5vw;
+      gap:clamp(6px,.46vw,12px);
       height:100%;
       min-height:0;
     }
@@ -126,31 +129,31 @@
       border:1px solid rgba(255,255,255,.08);
       border-radius:1vw;
       background:linear-gradient(180deg, rgba(17,35,59,.98), rgba(11,25,44,.98));
-      padding:.42vw .48vw;
+      padding:clamp(7px,.34vw,10px) clamp(8px,.40vw,12px);
       display:grid;
-      grid-template-rows:auto 1fr;
-      gap:.14vw;
+      grid-template-rows:auto auto 1fr;
+      gap:clamp(4px,.18vw,8px);
       min-height:0;
     }
 
     .trip-top{
-      display:grid; grid-template-columns:auto auto auto 1fr auto; gap:.24vw; align-items:center;
+      display:grid; grid-template-columns:auto auto auto 1fr auto; gap:clamp(4px,.18vw,8px); align-items:center;
     }
     .badge{
-      border-radius:.55vw; padding:.34vw .56vw; font-weight:900; line-height:1;
-      font-size:.64vw; text-transform:uppercase; white-space:nowrap;
+      border-radius:.55vw; padding:clamp(5px,.22vw,8px) clamp(9px,.34vw,13px); font-weight:900; line-height:1;
+      font-size:clamp(12px,.76vw,16px); text-transform:uppercase; white-space:nowrap;
     }
     .badge.trip{background:rgba(41,182,246,.14); color:#a8e5ff; border:1px solid rgba(41,182,246,.28)}
-    .badge.time{background:linear-gradient(180deg, rgba(122,240,160,.20), rgba(122,240,160,.10)); color:#d8ffe4; border:1px solid rgba(122,240,160,.34); font-size:.76vw; padding:.28vw .48vw; box-shadow:0 0 14px rgba(122,240,160,.12)}
+    .badge.time{background:linear-gradient(180deg, rgba(122,240,160,.20), rgba(122,240,160,.10)); color:#d8ffe4; border:1px solid rgba(122,240,160,.34); font-size:clamp(18px,1.08vw,26px); padding:clamp(7px,.28vw,10px) clamp(12px,.56vw,16px); box-shadow:0 0 14px rgba(122,240,160,.12)}
     .trip-card.afternoon .badge.time{background:rgba(255,190,92,.12); color:#ffe0a3; border:1px solid rgba(255,190,92,.25)}
-    .truck{justify-self:end; font-size:.76vw; color:#d7e7f7; font-weight:900}
+    .truck{justify-self:end; font-size:clamp(14px,.88vw,18px); color:#d7e7f7; font-weight:900}
 
     .trip-headline{
       display:block;
-      display:none;
+      padding-bottom:.18vw; border-bottom:1px solid rgba(255,255,255,.06);
     }
     .trip-route{
-      font-size:.9vw; font-weight:900; line-height:1.04;
+      font-size:1.02vw; font-weight:900; line-height:1.04;
       display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
     }
     .trip-count{
@@ -161,43 +164,31 @@
     .store-list{
       min-height:0;
       display:grid;
-      grid-template-columns:1fr;
-      gap:.14vw;
+      grid-auto-rows:minmax(0, auto);
+      gap:.28vw;
       align-content:start;
     }
 
     .store-row{
-      display:grid;
-      grid-template-columns:auto 1fr;
-      gap:.26vw;
+      display:grid; grid-template-columns:4.6vw 1fr;
+      gap:.55vw;
       align-items:center;
       border:1px solid rgba(255,255,255,.06);
       background:rgba(255,255,255,.03);
-      border-radius:.58vw;
-      padding:.22vw .32vw;
+      border-radius:.68vw;
+      padding:.38vw .52vw;
       min-width:0;
-      min-height:0;
     }
     .store-seq{
-      font-size:.6vw; font-weight:900; color:#9de7ff; text-transform:uppercase;
+      font-size:1vw; font-weight:900; color:#9de7ff; text-transform:uppercase;
       background:rgba(41,182,246,.12); border:1px solid rgba(41,182,246,.22);
-      border-radius:.36vw; padding:.12vw .24vw; text-align:center;
-      width:2.8vw; min-width:2.8vw;
+      border-radius:.48vw; padding:.28vw .28vw; text-align:center;
     }
     .store-main{min-width:0}
     .store-name{
-      font-size:.78vw; font-weight:900; line-height:1;
+      font-size:1.28vw; font-weight:900; line-height:1.06;
       white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     }
-    .store-row.more-stores{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      text-align:center;
-      background:rgba(255,202,92,.08);
-      border:1px dashed rgba(255,202,92,.26);
-    }
-    .store-row.more-stores .store-name{font-size:.82vw; white-space:normal}
     .lsp-inline{display:flex; align-items:baseline; justify-content:space-between; gap:.5vw}
     .lsp-inline .summary-note{margin:0; min-height:auto; text-align:left}
     .store-id{display:none}
@@ -226,8 +217,8 @@
 
     .playback-indicator{
       position:fixed;
-      right:1vw;
-      bottom:1vw;
+      right:clamp(10px,1vw,18px);
+      bottom:clamp(10px,1vw,18px);
       z-index:50;
       display:flex;
       align-items:center;
@@ -251,7 +242,7 @@
 
     .grid-panel{
       position:absolute; inset:0;
-      padding:.36vw;
+      padding:clamp(6px,.34vw,10px);
     }
     .grid-panel.enter-left{animation:slideInLeft .7s ease both}
     .grid-panel.enter-up{animation:slideInUp .7s ease both}
@@ -263,6 +254,14 @@
     @keyframes slideInUp {from{transform:translateY(100%);opacity:.18} to{transform:translateY(0);opacity:1}}
     @keyframes slideOutUp {from{transform:translateY(0);opacity:1} to{transform:translateY(-100%);opacity:.08}}
 
+    @media (min-width: 1920px) and (min-height: 1080px){
+      .page{padding:8px}
+      .title{font-size:36px}
+      .badge.time{font-size:22px}
+      .store-name{font-size:22px}
+      .store-seq{min-width:96px;width:96px}
+    }
+
     @media (max-width: 1200px){
       .title{font-size:30px}.subtitle{font-size:14px}.logo-box{height:52px;font-size:14px;min-width:150px}
       .meta-label,.summary-label,.page-stat-label,.store-point-label,.store-lsp-label,.store-id{font-size:10px}
@@ -270,7 +269,6 @@
       .summary-head{gap:12px}
       .page-banner-title{font-size:22px}.trip-route{font-size:18px}.trip-count{font-size:16px}
       .store-name,.truck,.badge{font-size:14px}.store-point-value,.store-lsp-value,.store-seq{font-size:13px}
-      .store-list{grid-template-columns:1fr}
     }
   </style>
 </head>
@@ -282,7 +280,7 @@
         <div class="logo-box small">Samsung SDS</div>
         <div>
           <div class="title">Outbound Pick Pack Dashboard</div>
-          
+          <div class="subtitle">TV mode · gộp cửa hàng theo trip · tự lật trang</div>
         </div>
       </div>
       <div class="meta">
@@ -296,7 +294,7 @@
         </div>
         <div class="meta-card">
           <div class="meta-label">Trạng thái</div>
-          <div class="meta-value"><span id="statusDot" class="status-dot"></span><span id="syncStatus">Loading</span></div>
+          <div class="meta-value"><span id="statusDot" class="status-dot"></span><span id="syncStatus">Đang tải</span></div>
         </div>
       </div>
     </section>
@@ -307,14 +305,14 @@
           <div class="summary-label">Tổng điểm giao</div>
           <div id="totalStops" class="summary-value">0</div>
         </div>
-        <div class="summary-note hidden">&nbsp;</div>
+        <div class="summary-note">Tổng số cửa hàng cần pick pack</div>
       </div>
       <div class="summary-card">
         <div class="summary-head">
           <div class="summary-label">Tổng chuyến</div>
           <div id="totalTrips" class="summary-value">0</div>
         </div>
-        <div class="summary-note hidden">&nbsp;</div>
+        <div class="summary-note">Đếm theo Trip No.</div>
       </div>
       <div class="summary-card">
         <div class="summary-head">
@@ -365,7 +363,7 @@
     <section class="footer">
       <div id="footerSource">Nguồn dữ liệu: Google Sheet trực tiếp · tự làm mới mỗi 60 giây</div>
       <div class="status-inline">
-        <span>Hiển thị 6 trip / trang · tối đa 6 cửa hàng / trip</span>
+        <span>Hiển thị 6 trip / trang</span>
         <span>•</span>
         <span>Auto flip</span>
       </div>
@@ -617,16 +615,6 @@
       return row;
     }
 
-    function createMoreStoresRow(hiddenCount) {
-      const row = document.createElement('div');
-      row.className = 'store-row more-stores';
-      row.innerHTML =
-        '<div class="store-main">' +
-          '<div class="store-name">+' + escapeHtml(hiddenCount) + ' cửa hàng nữa</div>' +
-        '</div>';
-      return row;
-    }
-
     function createTripCard(trip, periodKey) {
       const card = document.createElement('article');
       card.className = 'trip-card ' + periodKey;
@@ -647,22 +635,13 @@
       const head = document.createElement('div');
       head.className = 'trip-headline';
       head.innerHTML =
-        '';
+        '<div class="trip-route">Điểm dừng và tên cửa hàng</div>';
 
       const list = document.createElement('div');
       list.className = 'store-list';
-      const maxVisibleStores = 6;
-      const renderStores = trip.stores.length > maxVisibleStores
-        ? trip.stores.slice(0, maxVisibleStores - 1)
-        : trip.stores.slice(0, maxVisibleStores);
-
-      renderStores.forEach(function(store, index){
+      trip.stores.forEach(function(store, index){
         list.appendChild(createStoreRow(store, index));
       });
-
-      if (trip.stores.length > maxVisibleStores) {
-        list.appendChild(createMoreStoresRow(trip.stores.length - (maxVisibleStores - 1)));
-      }
 
       card.appendChild(top);
       card.appendChild(head);
@@ -876,13 +855,13 @@
       try {
         const items = await fetchGoogleSheetViaGviz();
         renderDashboard(items, 'Google Sheet trực tiếp');
-        setStatus('Connected', 'ok');
+        setStatus('Đồng bộ OK', 'ok');
       } catch (gvizErr) {
         console.warn('GViz lỗi, thử CSV export...', gvizErr);
         try {
           const csvText = await fetchCsvText(CSV_URL + '&t=' + Date.now());
           renderFromCsvText(csvText, 'Google Sheet CSV export');
-          setStatus('Connected', 'ok');
+          setStatus('Đồng bộ OK', 'ok');
         } catch (csvErr) {
           console.error(csvErr);
           useSampleData((csvErr && csvErr.message) || (gvizErr && gvizErr.message) || 'Lỗi tải dữ liệu');
