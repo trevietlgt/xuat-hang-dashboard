@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Outbound Pick Pack Dashboard</title>
+  <title>OUTBOUND PLAN DASHBOARD</title>
   <style>
     :root{
       --bg:#07111f;
@@ -1021,13 +1021,13 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         const items = await fetchGoogleSheetViaGviz();
         renderDashboard(items, 'Google Sheet trực tiếp');
-        setStatus('Connected', 'ok');
+        setStatus(' Đã kết nối', 'ok');
       } catch (gvizErr) {
         console.warn('GViz lỗi, thử CSV export...', gvizErr);
         try {
           const csvText = await fetchCsvText(CSV_URL + '&t=' + Date.now());
           renderFromCsvText(csvText, 'Google Sheet CSV export');
-          setStatus('Connected', 'ok');
+          setStatus(' Đã kết nối', 'ok');
         } catch (csvErr) {
           console.error(csvErr);
           useSampleData((csvErr && csvErr.message) || (gvizErr && gvizErr.message) || 'Lỗi tải dữ liệu');
