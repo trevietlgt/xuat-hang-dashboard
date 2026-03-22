@@ -419,7 +419,7 @@ document.addEventListener('DOMContentLoaded', () => {
       </div>
       <div class="page-stat">
         <div class="page-stat-label">Lật trang</div>
-        <div id="pageFlipEvery" class="page-stat-value">12s</div>
+        <div id="pageFlipEvery" class="page-stat-value">15s</div>
       </div>
     </section>
 
@@ -445,8 +445,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const SHEET_GID = '358090930';
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/export?format=csv&gid=' + SHEET_GID;
     const REFRESH_MS = 60000;
-    const PAGE_FLIP_MS = 12000;
-    const TRIPS_PER_PAGE = 6;
+    const PAGE_FLIP_MS = 15000;
+    const TRIPS_PER_PAGE = 4;
     const ANIMATION_MS = 700;
     const TZ = 'Asia/Bangkok';
 
@@ -1034,4 +1034,42 @@ document.addEventListener('DOMContentLoaded', () => {
   gap:6px;
   flex:1;
 }
+</style>
+
+<style>
+/* Không tách riêng ca sáng/ca chiều ở slide */
+.summary-row .summary-card:nth-child(3),
+.summary-row .summary-card:nth-child(4){
+  display:none !important;
+}
+
+/* Giữ layout summary gọn */
+.summary-row{
+  grid-template-columns: repeat(3, 1fr) !important;
+}
+
+/* 4 cột mỗi màn hình */
+.trip-grid{
+  display:grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  grid-template-rows: 1fr !important;
+  gap: clamp(10px, .5vw, 16px) !important;
+  align-items: stretch !important;
+  height: 100% !important;
+}
+
+/* Ẩn nhãn ca sáng/ca chiều ở banner */
+.page-banner-sub{
+  visibility:hidden;
+  height:0;
+  margin:0;
+}
+
+/* card fit đều màn hình */
+.trip-card{
+  height:100% !important;
+  overflow:hidden;
+}
+
+/* footer indicator vẫn gọn */
 </style>
