@@ -6,377 +6,274 @@
   <title>Outbound Pick Pack Dashboard</title>
   <style>
     :root{
-      --bg:#07111f;
-      --panel:#0d1b2d;
-      --panel-2:#11233b;
-      --line:rgba(255,255,255,.08);
-      --text:#eef6ff;
-      --muted:#9fb4cb;
-      --accent:#29b6f6;
-      --accent-2:#78ffd6;
-      --warn:#ffca5c;
-      --good:#7af0a0;
-      --danger:#ff7f7f;
-      --shadow:0 10px 30px rgba(0,0,0,.35);
+      --bg:#dfe3e8;
+      --grid:#3b3b3b;
+      --blue:#0b00ff;
+      --blue-dark:#0a4ea3;
+      --pink:#ff25ff;
+      --text:#0a0a0a;
+      --white:#ffffff;
+      --muted:#5d6570;
     }
 
     *{box-sizing:border-box}
     html,body{
       width:100%; height:100%; margin:0; overflow:hidden;
-      font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
-      background: radial-gradient(circle at top right, #14335d 0%, var(--bg) 38%, #030814 100%);
+      font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', 'Segoe UI', Arial, sans-serif;
+      background:var(--bg);
       color:var(--text);
     }
 
     .page{
-      width:100vw; height:100vh; padding:1.0vw;
-      display:grid; grid-template-rows:auto auto auto 1fr auto;
+      width:100vw; height:100vh;
+      display:grid;
+      grid-template-rows: 16vh 1fr 3.2vh;
+    }
+
+    .header{
+      display:grid;
+      grid-template-columns: 22vw 1fr 22vw;
+      border-bottom:1px solid var(--grid);
+      background:#d8dde2;
+    }
+
+    .brand{
+      border-right:1px solid #b8c1ca;
+      padding:.6vw .9vw;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      gap:.45vw;
+    }
+    .brand-line1{
+      font-family:'Segoe UI', Arial, sans-serif;
+      font-weight:800;
+      font-size:2.35vw;
+      color:#112a74;
+      line-height:1;
+      display:flex;
+      align-items:center;
       gap:.7vw;
     }
-
-    .topbar{
-      display:grid; grid-template-columns: 1.3fr auto; align-items:center;
-      gap:1vw;
-      padding:.95vw 1.1vw;
-      border:1px solid var(--line);
-      border-radius:1.2vw;
-      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-      box-shadow:var(--shadow);
+    .brand-square{
+      width:2.2vw; height:2.2vw; border-radius:.15vw;
+      background:#28c7b7;
+      display:inline-block;
+      position:relative;
+      flex:0 0 auto;
     }
-
-    .brand-wrap{display:flex; align-items:center; gap:.9vw; min-width:0}
-    .logo-box{
-      display:flex; align-items:center; justify-content:center;
-      min-width:9.4vw; height:3.2vw; padding:0 .8vw;
-      border-radius:.9vw; background:rgba(255,255,255,.07); border:1px solid var(--line);
-      font-weight:800; letter-spacing:.04em; font-size:.96vw; text-transform:uppercase;
-      white-space:nowrap;
+    .brand-square::after{
+      content:'';
+      position:absolute;
+      width:.9vw; height:.9vw;
+      border:.35vw solid #fff;
+      border-top:none; border-right:none;
+      left:.35vw; top:.35vw;
+      transform:rotate(0deg);
     }
-    .logo-box.small{min-width:8vw}
-    .title{font-size:1.9vw; font-weight:900; line-height:1.03; text-transform:uppercase}
-    .subtitle{margin-top:.22vw; font-size:.9vw; color:var(--muted); font-weight:600}
-
-    .meta{display:flex; gap:.6vw}
-    .meta-card{
-      min-width:8.1vw; padding:.65vw .8vw;
-      border:1px solid var(--line); border-radius:.95vw;
-      background:rgba(255,255,255,.05);
+    .brand-line2{
+      font-family:'Segoe UI', Arial, sans-serif;
+      font-weight:900;
+      font-size:2.55vw;
+      color:#1854a7;
+      line-height:1;
     }
-    .meta-label{font-size:.7vw; color:var(--muted); font-weight:800; text-transform:uppercase; letter-spacing:.08em}
-    .meta-value{font-size:1.1vw; font-weight:900; margin-top:.18vw}
-
-    .summary-row{
-      display:grid; grid-template-columns: repeat(5, 1fr);
-      gap:.65vw;
-    }
-    .summary-card{
-      border:1px solid var(--line); border-radius:1vw; padding:.72vw .9vw;
-      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.025));
-      box-shadow:var(--shadow);
-      min-height:8.5vh;
-    }
-    .summary-label{font-size:.75vw; color:var(--muted); font-weight:800; text-transform:uppercase; letter-spacing:.08em}
-    .summary-value{font-size:1.8vw; font-weight:900; margin-top:.18vw; line-height:1}
-    .summary-note{font-size:.8vw; color:#dce9f7; margin-top:.2vw}
-
-    .page-info{
-      display:grid; grid-template-columns: 1fr auto auto auto;
-      gap:.65vw;
+    .header-center{
+      display:flex;
       align-items:center;
+      justify-content:center;
+      font-family:'Segoe UI', Arial, sans-serif;
+      font-weight:800;
+      font-size:1.25vw;
+      color:#637080;
+      letter-spacing:.02em;
     }
-    .page-banner,.page-stat{
-      border:1px solid var(--line); border-radius:1vw;
-      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.025));
-      box-shadow:var(--shadow);
-      padding:.78vw .95vw;
+    .header-right{
+      padding:.8vw 1.1vw;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      gap:.75vw;
+      align-items:flex-end;
+      font-weight:900;
+      font-size:1.75vw;
+      line-height:1;
+      color:#000;
     }
-    .page-banner-title{font-size:1.45vw; font-weight:900; text-transform:uppercase}
-    .page-banner-sub{font-size:.85vw; color:var(--muted); margin-top:.16vw; font-weight:700}
-    .page-stat-label{font-size:.68vw; color:var(--muted); font-weight:800; text-transform:uppercase; letter-spacing:.08em}
-    .page-stat-value{font-size:1.3vw; font-weight:900; margin-top:.12vw}
 
     .board{
-      border:1px solid var(--line); border-radius:1.2vw;
-      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.025));
-      box-shadow:var(--shadow);
-      padding:.8vw;
-      min-height:0;
-      overflow:hidden;
-    }
-
-    .trip-grid{
       display:grid;
-      grid-template-columns:repeat(2, 1fr);
-      grid-template-rows:repeat(2, 1fr);
-      gap:.8vw;
-      height:100%;
+      grid-template-columns: repeat(6, 1fr);
       min-height:0;
     }
 
-    .trip-card{
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:1vw;
-      background:linear-gradient(180deg, rgba(17,35,59,.98), rgba(11,25,44,.98));
-      padding:.8vw .9vw;
+    .trip-col{
+      border-right:1px solid var(--grid);
       display:grid;
-      grid-template-rows:auto auto 1fr;
-      gap:.5vw;
-      min-height:0;
+      grid-template-rows: 13.5vh 9.5vh repeat(5, 1fr);
+      min-width:0;
+      background:#dfdfdf;
     }
+    .trip-col:first-child{border-left:1px solid var(--grid)}
 
-    .trip-top{
-      display:grid; grid-template-columns:auto auto 1fr auto; gap:.48vw; align-items:center;
-    }
-    .badge{
-      border-radius:.55vw; padding:.34vw .56vw; font-weight:900; line-height:1;
-      font-size:.86vw; text-transform:uppercase; white-space:nowrap;
-    }
-    .badge.trip{background:rgba(41,182,246,.14); color:#a8e5ff; border:1px solid rgba(41,182,246,.28)}
-    .badge.time{background:rgba(122,240,160,.12); color:#bdf7cd; border:1px solid rgba(122,240,160,.26)}
-    .trip-card.afternoon .badge.time{background:rgba(255,190,92,.12); color:#ffe0a3; border:1px solid rgba(255,190,92,.25)}
-    .truck{justify-self:end; font-size:.95vw; color:#d7e7f7; font-weight:800}
-
-    .trip-headline{
-      display:grid; grid-template-columns:1fr auto; gap:.6vw; align-items:end;
-      padding-bottom:.25vw; border-bottom:1px solid rgba(255,255,255,.06);
-    }
-    .trip-route{
-      font-size:1.15vw; font-weight:900; line-height:1.08;
-      display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
-    }
-    .trip-count{
-      font-size:1vw; font-weight:900; color:#dff6ff; white-space:nowrap;
-    }
-
-    .store-list{
-      min-height:0;
-      display:grid;
-      grid-auto-rows:minmax(0, auto);
-      gap:.42vw;
-      align-content:start;
-    }
-
-    .store-row{
-      display:grid; grid-template-columns:4.4vw 1fr 4.4vw;
-      gap:.45vw;
+    .trip-head{
+      background:linear-gradient(180deg, #1409ff, #0b00ff);
+      color:#fff;
+      border-bottom:1px solid var(--grid);
+      padding:.45vw .25vw;
+      display:flex;
+      flex-direction:column;
       align-items:center;
-      border:1px solid rgba(255,255,255,.06);
-      background:rgba(255,255,255,.03);
-      border-radius:.72vw;
-      padding:.45vw .55vw;
+      justify-content:center;
+      text-align:center;
       min-width:0;
     }
-    .store-seq{
-      font-size:.76vw; font-weight:900; color:#9de7ff; text-transform:uppercase;
-      background:rgba(41,182,246,.12); border:1px solid rgba(41,182,246,.22);
-      border-radius:.45vw; padding:.28vw .36vw; text-align:center;
+    .trip-no{
+      font-size:2vw;
+      line-height:1;
+      font-weight:900;
     }
-    .store-main{min-width:0}
-    .store-name{
-      font-size:.97vw; font-weight:900; line-height:1.04;
-      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    .trip-lsp{
+      font-size:1.55vw;
+      line-height:1.05;
+      font-weight:900;
+      margin-top:.2vw;
+      text-transform:uppercase;
     }
-    .store-id{
-      font-size:.72vw; color:var(--muted); font-weight:700; margin-top:.08vw;
-      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-    }
-    .store-point,.store-lsp{
-      text-align:center;
-      border-left:1px solid rgba(255,255,255,.06);
-      padding-left:.35vw;
-    }
-    .store-point-label,.store-lsp-label{
-      font-size:.62vw; color:var(--muted); font-weight:800; text-transform:uppercase; letter-spacing:.08em;
-    }
-    .store-point-value,.store-lsp-value{
-      font-size:.88vw; font-weight:900; margin-top:.08vw;
-      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    .trip-truck{
+      font-size:1.45vw;
+      line-height:1.05;
+      font-weight:900;
+      margin-top:.15vw;
     }
 
-    .empty{
-      height:100%; display:flex; align-items:center; justify-content:center; text-align:center;
-      font-size:1.2vw; color:var(--muted); font-weight:700; padding:2vw;
+    .trip-time{
+      border-bottom:1px solid var(--grid);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      font-weight:900;
+      font-size:2.55vw;
+      line-height:1;
+      color:var(--blue-dark);
+      background:#e3e3e3;
+      padding:.2vw;
     }
+    .trip-time.afternoon{ color:var(--pink); }
+
+    .store-cell{
+      border-bottom:1px solid var(--grid);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      padding:.45vw .35vw;
+      font-weight:900;
+      font-size:1.2vw;
+      line-height:1.2;
+      text-transform:uppercase;
+      word-break:break-word;
+      overflow:hidden;
+      background:#e0e0e0;
+    }
+    .store-cell.empty{ color:transparent; }
 
     .footer{
-      display:grid; grid-template-columns:1fr auto;
-      gap:.8vw;
+      border-top:1px solid #b8c1ca;
+      display:flex;
       align-items:center;
-      font-size:.78vw; color:#89a3be;
-      padding:0 .15vw;
+      justify-content:space-between;
+      padding:0 .8vw;
+      font-family:'Segoe UI', Arial, sans-serif;
+      font-size:.8vw;
+      color:#52606d;
+      background:#d8dde2;
     }
-
-    .status-inline{display:flex; align-items:center; gap:.4vw}
-    .status-dot{
-      width:.58vw; height:.58vw; border-radius:999px; display:inline-block;
-      background:var(--good); box-shadow:0 0 12px rgba(122,240,160,.55);
-    }
-    .status-dot.warn{background:var(--warn); box-shadow:0 0 12px rgba(255,202,92,.45)}
-    .status-dot.danger{background:var(--danger); box-shadow:0 0 12px rgba(255,127,127,.45)}
 
     @media (max-width: 1200px){
-      .title{font-size:30px}.subtitle{font-size:14px}.logo-box{height:52px;font-size:14px;min-width:150px}
-      .meta-label,.summary-label,.page-stat-label,.store-point-label,.store-lsp-label,.store-id{font-size:10px}
-      .meta-value,.page-stat-value{font-size:18px}.summary-value{font-size:28px}.summary-note,.page-banner-sub{font-size:13px}
-      .page-banner-title{font-size:22px}.trip-route{font-size:18px}.trip-count{font-size:16px}
-      .store-name,.truck,.badge{font-size:14px}.store-point-value,.store-lsp-value,.store-seq{font-size:13px}
+      .header{grid-template-columns: 270px 1fr 300px}
+      .brand-line1{font-size:28px}.brand-line2{font-size:32px}.brand-square{width:28px;height:28px}
+      .header-right{font-size:24px}.trip-no{font-size:28px}.trip-lsp{font-size:22px}.trip-truck{font-size:20px}
+      .trip-time{font-size:34px}.store-cell{font-size:16px}.footer{font-size:11px}
     }
   </style>
 </head>
 <body>
   <div class="page">
-    <section class="topbar">
-      <div class="brand-wrap">
-        <div class="logo-box">Cello Square</div>
-        <div class="logo-box small">Samsung SDS</div>
-        <div>
-          <div class="title">Outbound Pick Pack Dashboard</div>
-          <div class="subtitle">Gộp cửa hàng theo Trip · không cuộn · tự lật trang để xem toàn bộ chuyến</div>
-        </div>
+    <section class="header">
+      <div class="brand">
+        <div class="brand-line1"><span class="brand-square"></span><span>Cello Square</span></div>
+        <div class="brand-line2">SAMSUNG SDS</div>
       </div>
-      <div class="meta">
-        <div class="meta-card">
-          <div class="meta-label">Ngày kế hoạch</div>
-          <div id="planDate" class="meta-value">--/--/----</div>
-        </div>
-        <div class="meta-card">
-          <div class="meta-label">Cập nhật</div>
-          <div id="lastUpdated" class="meta-value">--:--:--</div>
-        </div>
-        <div class="meta-card">
-          <div class="meta-label">Trạng thái</div>
-          <div class="meta-value"><span id="statusDot" class="status-dot"></span><span id="syncStatus">Đang tải</span></div>
-        </div>
+      <div class="header-center">
+        <div>OUTBOUND PICK PACK DASHBOARD</div>
       </div>
+      <div class="header-right" id="headerSummary"></div>
     </section>
 
-    <section class="summary-row">
-      <div class="summary-card">
-        <div class="summary-label">Tổng điểm giao</div>
-        <div id="totalStops" class="summary-value">0</div>
-        <div class="summary-note">Tổng số cửa hàng cần pick pack</div>
-      </div>
-      <div class="summary-card">
-        <div class="summary-label">Tổng chuyến</div>
-        <div id="totalTrips" class="summary-value">0</div>
-        <div class="summary-note">Đếm theo Trip No.</div>
-      </div>
-      <div class="summary-card">
-        <div class="summary-label">Ca sáng</div>
-        <div id="morningCount" class="summary-value">0</div>
-        <div class="summary-note">Số trip pickup trước 12:00</div>
-      </div>
-      <div class="summary-card">
-        <div class="summary-label">Ca chiều</div>
-        <div id="afternoonCount" class="summary-value">0</div>
-        <div class="summary-note">Số trip pickup từ 12:00</div>
-      </div>
-      <div class="summary-card">
-        <div class="summary-label">Đối tác vận chuyển</div>
-        <div id="lspCount" class="summary-value">0</div>
-        <div class="summary-note"><span id="lspList">-</span></div>
-      </div>
-    </section>
-
-    <section class="page-info">
-      <div class="page-banner">
-        <div id="pageTitle" class="page-banner-title">Ca sáng</div>
-        <div id="pageSubTitle" class="page-banner-sub">Trang 1 / 1</div>
-      </div>
-      <div class="page-stat">
-        <div class="page-stat-label">Trip trên trang</div>
-        <div id="pageTripCount" class="page-stat-value">0</div>
-      </div>
-      <div class="page-stat">
-        <div class="page-stat-label">Điểm giao trên trang</div>
-        <div id="pageStopCount" class="page-stat-value">0</div>
-      </div>
-      <div class="page-stat">
-        <div class="page-stat-label">Lật trang</div>
-        <div id="pageFlipEvery" class="page-stat-value">12s</div>
-      </div>
-    </section>
-
-    <section class="board">
-      <div id="tripGrid" class="trip-grid"></div>
-    </section>
+    <section class="board" id="board"></section>
 
     <section class="footer">
-      <div id="footerSource">Nguồn dữ liệu: Google Sheets Published CSV · tự làm mới mỗi 60 giây</div>
-      <div class="status-inline">
-        <span>Hiển thị 4 trip / trang</span>
-        <span>•</span>
-        <span>Auto flip</span>
-      </div>
+      <span id="footerLeft">Nguồn dữ liệu: Google Sheets Published CSV</span>
+      <span id="footerRight">6 trip / trang • tự lật 10 giây</span>
     </section>
   </div>
 
   <script>
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSQfyrmniG35M9Hi7VBR_ZDjRlRwc7te3tx1upvWbCsIA2MESeRkp6Wx7zZr_VUflPupi-rbnGFbgM1/pub?gid=358090930&single=true&output=csv';
     const REFRESH_MS = 60000;
-    const PAGE_FLIP_MS = 12000;
-    const TRIPS_PER_PAGE = 4;
+    const PAGE_FLIP_MS = 10000;
+    const TRIPS_PER_PAGE = 6;
+    const STORE_ROWS_PER_COLUMN = 5;
     const TZ = 'Asia/Bangkok';
 
     const SAMPLE_CSV = `DATE,TRIP NO.,PICKUP TIME (PLAN),TRUCK TYPE,STORE ID,STORE NAME,DELIVERY POINT,LSP
-23/03/2026,125,08:00,4W,1001,MM Mega Market An Phú,12,Samsung SDS
-23/03/2026,125,08:00,4W,1007,MM Mega Market Thủ Đức,5,Samsung SDS
-23/03/2026,125,08:00,4W,1011,MM Mega Market Biên Hòa,3,Samsung SDS
-23/03/2026,128,09:30,4W,1002,MM Mega Market Bình Phú,8,Samsung SDS
-23/03/2026,128,09:30,4W,1012,MM Mega Market Tân Phú,6,Samsung SDS
-23/03/2026,130,11:15,2T,1003,MM Mega Market Hiệp Phú,6,Cello Square
-23/03/2026,131,13:30,4W,1004,MM Mega Market Hà Đông,10,Cello Square
-23/03/2026,131,13:30,4W,1013,MM Mega Market Hoàng Mai,4,Cello Square
-23/03/2026,133,15:00,2T,1005,MM Mega Market Long Biên,7,Samsung SDS
-23/03/2026,133,15:00,2T,1009,MM Mega Market Thanh Xuân,3,Samsung SDS
-23/03/2026,136,17:00,4W,1006,MM Mega Market Thăng Long,9,Cello Square`;
+23/03/2026,124,07:00,2.5 Ton,VN1001,ĐH Lao Động - Xã Hội,12,GSC
+23/03/2026,125,08:00,1.9 Ton,VN0447,Nguyen Son,5,FML
+23/03/2026,125,08:00,1.9 Ton,VN0468,Vinhomes Sym,3,FML
+23/03/2026,125,08:00,1.9 Ton,VN0476,HV Nong Nghiep,4,FML
+23/03/2026,125,08:00,1.9 Ton,VN0439,Hang Dau,2,FML
+23/03/2026,126,09:00,1.9 Ton,VN0486,N03 Ngoai Giao Doan,8,GHTK
+23/03/2026,126,09:00,1.9 Ton,VN0465,FLC Pham Hung,7,GHTK
+23/03/2026,126,09:00,1.9 Ton,VN0460,Skyline,1,GHTK
+23/03/2026,126,09:00,1.9 Ton,VN0438,Ha Trung,2,GHTK
+23/03/2026,127,10:00,1 Ton,VN0498,Ma May,6,GSC
+23/03/2026,127,10:00,1 Ton,VN0437,Nguyen Huu Huan,3,GSC
+23/03/2026,128,11:15,2.5 Ton,VN0501,ĐH Lao Động - Xã Hội,9,GSC
+23/03/2026,129,16:00,2.5 Ton,VN0459,Ngu Xa,5,GSC
+23/03/2026,129,16:00,2.5 Ton,VN0485,Lang SVien HACINCO,4,GSC
+23/03/2026,129,16:00,2.5 Ton,VN0470,Nguy Nhu Kon Tum,3,GSC
+23/03/2026,129,16:00,2.5 Ton,VN0484,Le Van Luong,2,GSC
+23/03/2026,130,17:00,2.5 Ton,VN0436,Doi Can,8,GSC
+23/03/2026,130,17:00,2.5 Ton,VN0488,DH Su Pham,4,GSC
+23/03/2026,130,17:00,2.5 Ton,VN0451,36 Duy Tan,2,GSC
+23/03/2026,130,17:00,2.5 Ton,VN0435,The West,1,GSC
+23/03/2026,131,18:00,1.9 Ton,VN0490,Vu Trong Phung,7,GHTK
+23/03/2026,131,18:00,1.9 Ton,VN0500,Nguyen Trai,4,GHTK
+23/03/2026,131,18:00,1.9 Ton,VN0502,Vinaconex 3,2,GHTK
+23/03/2026,131,18:00,1.9 Ton,VN0442,Taisei Square,1,GHTK`;
 
     const els = {
-      planDate: document.getElementById('planDate'),
-      lastUpdated: document.getElementById('lastUpdated'),
-      syncStatus: document.getElementById('syncStatus'),
-      statusDot: document.getElementById('statusDot'),
-      totalStops: document.getElementById('totalStops'),
-      totalTrips: document.getElementById('totalTrips'),
-      morningCount: document.getElementById('morningCount'),
-      afternoonCount: document.getElementById('afternoonCount'),
-      lspCount: document.getElementById('lspCount'),
-      lspList: document.getElementById('lspList'),
-      pageTitle: document.getElementById('pageTitle'),
-      pageSubTitle: document.getElementById('pageSubTitle'),
-      pageTripCount: document.getElementById('pageTripCount'),
-      pageStopCount: document.getElementById('pageStopCount'),
-      pageFlipEvery: document.getElementById('pageFlipEvery'),
-      tripGrid: document.getElementById('tripGrid'),
-      footerSource: document.getElementById('footerSource')
+      board: document.getElementById('board'),
+      headerSummary: document.getElementById('headerSummary'),
+      footerLeft: document.getElementById('footerLeft')
     };
 
     let refreshTimer = null;
     let flipTimer = null;
-    let pageState = { pages: [], currentIndex: 0 };
-
-    function formatNow() {
-      return new Date().toLocaleTimeString('vi-VN', { hour12:false, timeZone: TZ });
-    }
-
-    function setStatus(text, type) {
-      const statusType = type || 'ok';
-      els.syncStatus.textContent = text;
-      els.statusDot.className = 'status-dot';
-      if (statusType === 'warn') els.statusDot.classList.add('warn');
-      if (statusType === 'danger') els.statusDot.classList.add('danger');
-    }
+    let currentPages = [];
+    let currentPageIndex = 0;
+    let latestTrips = [];
 
     function csvToRows(csv) {
       const rows = [];
       let row = [];
       let value = '';
       let inQuotes = false;
-
       for (let i = 0; i < csv.length; i++) {
         const ch = csv[i];
         const next = csv[i + 1];
-
         if (ch === '"') {
           if (inQuotes && next === '"') {
             value += '"';
@@ -390,27 +287,25 @@
         } else if ((ch === '\n' || ch === '\r') && !inQuotes) {
           if (ch === '\r' && next === '\n') i++;
           row.push(value);
-          if (row.some(function(cell){ return String(cell).trim() !== ''; })) rows.push(row);
+          if (row.some(cell => String(cell).trim() !== '')) rows.push(row);
           row = [];
           value = '';
         } else {
           value += ch;
         }
       }
-
       if (value.length || row.length) {
         row.push(value);
-        if (row.some(function(cell){ return String(cell).trim() !== ''; })) rows.push(row);
+        if (row.some(cell => String(cell).trim() !== '')) rows.push(row);
       }
-
       return rows;
     }
 
-    function normalizeTime(text) {
-      return String(text || '').replace(/\s+/g, ' ').trim().toUpperCase();
+    function normalizeTime(text='') {
+      return String(text).replace(/\s+/g, ' ').trim().toUpperCase();
     }
 
-    function parseHourMinute(text) {
+    function parseHourMinute(text='') {
       const m = normalizeTime(text).match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
       if (!m) return null;
       let hour = Number(m[1]);
@@ -418,17 +313,20 @@
       const ampm = (m[3] || '').toUpperCase();
       if (ampm === 'PM' && hour < 12) hour += 12;
       if (ampm === 'AM' && hour === 12) hour = 0;
-      return { hour: hour, minute: minute, total: hour * 60 + minute };
+      return { hour, minute, total: hour * 60 + minute };
     }
 
-    function toDisplayDate(dateStr) {
-      const t = String(dateStr || '').trim();
-      if (/^\d{2}\/\d{2}\/\d{4}$/.test(t)) return t;
-      return t || '--/--/----';
+    function formatTimeForBoard(text='') {
+      const parsed = parseHourMinute(text);
+      if (!parsed) return String(text || '').toUpperCase();
+      const suffix = parsed.hour >= 12 ? 'PM' : 'AM';
+      let displayHour = parsed.hour % 12;
+      if (displayHour === 0) displayHour = 12;
+      return `${displayHour}:${String(parsed.minute).padStart(2,'0')} ${suffix}`;
     }
 
-    function escapeHtml(str) {
-      return String(str || '')
+    function escapeHtml(str='') {
+      return String(str)
         .replaceAll('&', '&amp;')
         .replaceAll('<', '&lt;')
         .replaceAll('>', '&gt;')
@@ -437,45 +335,33 @@
     }
 
     function pickHeaderAndRows(rows) {
-      let headerIndex = rows.findIndex(function(r){
+      let headerIndex = rows.findIndex(r => {
         const c0 = String(r[0] || '').trim().toUpperCase();
         const c1 = String(r[1] || '').trim().toUpperCase();
-        return c0 === 'DATE' && c1.indexOf('TRIP') >= 0;
+        return c0 === 'DATE' && c1.includes('TRIP');
       });
-
       if (headerIndex < 0) headerIndex = 0;
-
-      const data = rows.slice(headerIndex + 1).filter(function(r){
-        return r.some(function(cell){ return String(cell).trim() !== ''; });
-      });
-
-      return { data: data };
+      return rows.slice(headerIndex + 1).filter(r => r.some(cell => String(cell).trim() !== ''));
     }
 
     function mapRows(rows) {
-      const data = pickHeaderAndRows(rows).data;
-      return data.map(function(r, index){
-        return {
-          rowIndex: index,
-          date: (r[0] || '').trim(),
-          tripNo: (r[1] || '').trim(),
-          pickupTime: (r[2] || '').trim(),
-          truckType: (r[3] || '').trim(),
-          storeId: (r[4] || '').trim(),
-          storeName: (r[5] || '').trim(),
-          deliveryPoint: (r[6] || '').trim(),
-          lsp: (r[7] || '').trim()
-        };
-      }).filter(function(x){
-        return x.tripNo && x.pickupTime && (x.storeName || x.storeId);
-      });
+      return pickHeaderAndRows(rows).map((r, index) => ({
+        rowIndex: index,
+        date: (r[0] || '').trim(),
+        tripNo: (r[1] || '').trim(),
+        pickupTime: (r[2] || '').trim(),
+        truckType: (r[3] || '').trim(),
+        storeId: (r[4] || '').trim(),
+        storeName: (r[5] || '').trim(),
+        deliveryPoint: (r[6] || '').trim(),
+        lsp: (r[7] || '').trim()
+      })).filter(x => x.tripNo && x.pickupTime && (x.storeName || x.storeId));
     }
 
     function groupTrips(items) {
       const tripMap = new Map();
       const trips = [];
-
-      items.forEach(function(item){
+      items.forEach(item => {
         const key = String(item.tripNo).trim();
         if (!tripMap.has(key)) {
           const trip = {
@@ -484,184 +370,127 @@
             truckType: item.truckType,
             lsp: item.lsp,
             date: item.date,
-            orderIndex: item.rowIndex,
-            pickupTotal: (parseHourMinute(item.pickupTime) || {}).total || 9999,
+            rowIndex: item.rowIndex,
             stores: []
           };
           tripMap.set(key, trip);
           trips.push(trip);
         }
-
         tripMap.get(key).stores.push({
-          storeId: item.storeId,
           storeName: item.storeName,
-          deliveryPoint: item.deliveryPoint,
-          lsp: item.lsp
+          storeId: item.storeId,
+          rowIndex: item.rowIndex
         });
       });
-
-      return trips.sort(function(a, b){ return a.orderIndex - b.orderIndex; });
+      return trips;
     }
 
-    function paginateTrips(trips, periodKey, periodLabel) {
+    function chunkTrips(trips, size) {
       const pages = [];
-      for (let i = 0; i < trips.length; i += TRIPS_PER_PAGE) {
-        pages.push({
-          periodKey: periodKey,
-          periodLabel: periodLabel,
-          trips: trips.slice(i, i + TRIPS_PER_PAGE)
-        });
-      }
+      for (let i = 0; i < trips.length; i += size) pages.push(trips.slice(i, i + size));
       return pages;
     }
 
-    function buildPages(trips) {
-      const morningTrips = trips.filter(function(x){
-        const parsed = parseHourMinute(x.pickupTime);
-        return (parsed ? parsed.hour : 0) < 12;
-      });
-      const afternoonTrips = trips.filter(function(x){
-        const parsed = parseHourMinute(x.pickupTime);
-        return (parsed ? parsed.hour : 0) >= 12;
-      });
-
-      return {
-        pages: paginateTrips(morningTrips, 'morning', 'Ca sáng').concat(
-          paginateTrips(afternoonTrips, 'afternoon', 'Ca chiều')
-        ),
-        morningTrips: morningTrips,
-        afternoonTrips: afternoonTrips
-      };
+    function isAfternoon(timeText='') {
+      return (parseHourMinute(timeText)?.hour ?? 0) >= 12;
     }
 
-    function createStoreRow(store, index) {
-  const row = document.createElement('div');
-  row.className = 'store-row';
+    function renderHeaderSummary(trips) {
+      const countsByDate = new Map();
+      trips.forEach(trip => {
+        const date = trip.date || '--/--/----';
+        countsByDate.set(date, (countsByDate.get(date) || 0) + 1);
+      });
+      const lines = [...countsByDate.entries()].sort((a,b) => a[0].localeCompare(b[0], 'vi')).slice(-2);
+      els.headerSummary.innerHTML = lines.map(([date, count]) => `${escapeHtml(date)}: ${count}/${count} TRUCK`).join('');
+      if (lines.length === 2) {
+        els.headerSummary.innerHTML = `<div>${escapeHtml(lines[0][0])}: ${lines[0][1]}/${lines[0][1]} TRUCK</div><div>${escapeHtml(lines[1][0])}: ${lines[1][1]}/${lines[1][1]} TRUCK</div>`;
+      } else if (lines.length === 1) {
+        els.headerSummary.innerHTML = `<div>${escapeHtml(lines[0][0])}: ${lines[0][1]}/${lines[0][1]} TRUCK</div>`;
+      } else {
+        els.headerSummary.innerHTML = '<div>--/--/----: 0/0 TRUCK</div>';
+      }
+    }
 
-  row.innerHTML =
-    '<div class="store-seq">Stop ' + (index + 1) + '</div>' +
-    '<div class="store-main">' +
-      '<div class="store-name">' + escapeHtml(store.storeName || '-') + '</div>' +
-    '</div>' +
-    '<div class="store-lsp">' +
-      '<div class="store-lsp-label">LSP</div>' +
-      '<div class="store-lsp-value">' + escapeHtml(store.lsp || '-') + '</div>' +
-    '</div>';
-
-  return row;
-}
-
-    function createTripCard(trip, periodKey) {
-      const card = document.createElement('article');
-      card.className = 'trip-card ' + periodKey;
-
-      const routeText = trip.stores.map(function(store){
-        return store.storeName || store.storeId || '-';
-      }).join(' • ');
-
-      const top = document.createElement('div');
-      top.className = 'trip-top';
-      top.innerHTML =
-        '<span class="badge trip">Trip ' + escapeHtml(trip.tripNo) + '</span>' +
-        '<span class="badge time">' + escapeHtml(trip.pickupTime) + '</span>' +
-        '<div></div>' +
-        '<div class="truck">' + escapeHtml(trip.truckType || '-') + '</div>';
+    function createTripColumn(trip) {
+      const col = document.createElement('div');
+      col.className = 'trip-col';
 
       const head = document.createElement('div');
-      head.className = 'trip-headline';
-      head.innerHTML =
-        '<div class="trip-route">' + escapeHtml(routeText) + '</div>' +
-        '<div class="trip-count">' + escapeHtml(trip.stores.length) + ' cửa hàng</div>';
+      head.className = 'trip-head';
+      head.innerHTML = `
+        <div class="trip-no">${escapeHtml(trip.tripNo)}</div>
+        <div class="trip-lsp">${escapeHtml(trip.lsp || '-')}</div>
+        <div class="trip-truck">${escapeHtml(trip.truckType || '-')}</div>
+      `;
 
-      const list = document.createElement('div');
-      list.className = 'store-list';
-      trip.stores.forEach(function(store, index){
-        list.appendChild(createStoreRow(store, index));
-      });
+      const time = document.createElement('div');
+      time.className = 'trip-time' + (isAfternoon(trip.pickupTime) ? ' afternoon' : '');
+      time.textContent = formatTimeForBoard(trip.pickupTime);
 
-      card.appendChild(top);
-      card.appendChild(head);
-      card.appendChild(list);
-      return card;
+      col.appendChild(head);
+      col.appendChild(time);
+
+      for (let i = 0; i < STORE_ROWS_PER_COLUMN; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'store-cell';
+        const store = trip.stores[i];
+        if (store) {
+          cell.textContent = store.storeName || store.storeId || '-';
+        } else {
+          cell.classList.add('empty');
+          cell.textContent = '-';
+        }
+        col.appendChild(cell);
+      }
+      return col;
     }
 
-    function renderPage(index) {
-      const totalPages = pageState.pages.length;
+    function createEmptyColumn() {
+      const col = document.createElement('div');
+      col.className = 'trip-col';
+      col.innerHTML = `
+        <div class="trip-head"></div>
+        <div class="trip-time"></div>
+        <div class="store-cell empty">-</div>
+        <div class="store-cell empty">-</div>
+        <div class="store-cell empty">-</div>
+        <div class="store-cell empty">-</div>
+        <div class="store-cell empty">-</div>
+      `;
+      return col;
+    }
 
-      if (!totalPages) {
-        els.tripGrid.innerHTML = '<div class="empty">Không có dữ liệu hợp lệ</div>';
-        els.pageTitle.textContent = 'Không có dữ liệu';
-        els.pageSubTitle.textContent = 'Trang 0 / 0';
-        els.pageTripCount.textContent = '0';
-        els.pageStopCount.textContent = '0';
-        return;
-      }
-
-      pageState.currentIndex = ((index % totalPages) + totalPages) % totalPages;
-      const page = pageState.pages[pageState.currentIndex];
-      const stopCount = page.trips.reduce(function(sum, trip){
-        return sum + trip.stores.length;
-      }, 0);
-
-      els.pageTitle.textContent = page.periodLabel;
-      els.pageSubTitle.textContent = 'Trang ' + (pageState.currentIndex + 1) + ' / ' + totalPages;
-      els.pageTripCount.textContent = String(page.trips.length);
-      els.pageStopCount.textContent = String(stopCount);
-      els.pageFlipEvery.textContent = String(PAGE_FLIP_MS / 1000) + 's';
-
-      els.tripGrid.innerHTML = '';
-      page.trips.forEach(function(trip){
-        els.tripGrid.appendChild(createTripCard(trip, page.periodKey));
-      });
-
-      const emptySlots = TRIPS_PER_PAGE - page.trips.length;
-      for (let i = 0; i < emptySlots; i++) {
-        const filler = document.createElement('div');
-        filler.className = 'trip-card';
-        filler.style.opacity = '.12';
-        filler.innerHTML = '<div class="empty">Trống</div>';
-        els.tripGrid.appendChild(filler);
+    function renderPage(pageTrips) {
+      els.board.innerHTML = '';
+      pageTrips.forEach(trip => els.board.appendChild(createTripColumn(trip)));
+      for (let i = pageTrips.length; i < TRIPS_PER_PAGE; i++) {
+        els.board.appendChild(createEmptyColumn());
       }
     }
 
-    function startPageFlip() {
+    function startFlip() {
       if (flipTimer) clearInterval(flipTimer);
-      if (pageState.pages.length <= 1) return;
-      flipTimer = setInterval(function(){
-        renderPage(pageState.currentIndex + 1);
+      if (currentPages.length <= 1) return;
+      flipTimer = setInterval(() => {
+        currentPageIndex = (currentPageIndex + 1) % currentPages.length;
+        renderPage(currentPages[currentPageIndex]);
       }, PAGE_FLIP_MS);
     }
 
-    function renderDashboard(items, sourceLabel) {
-      const label = sourceLabel || 'Google Sheets Published CSV';
-      const trips = groupTrips(items);
-      const built = buildPages(trips);
-      const pages = built.pages;
-      const morningTrips = built.morningTrips;
-      const afternoonTrips = built.afternoonTrips;
-      const lsps = Array.from(new Set(items.map(function(x){ return x.lsp; }).filter(Boolean)));
-      const planDate = items[0] ? items[0].date : '';
-
-      pageState.pages = pages;
-      pageState.currentIndex = 0;
-
-      els.planDate.textContent = toDisplayDate(planDate);
-      els.lastUpdated.textContent = formatNow();
-      els.totalStops.textContent = String(items.length);
-      els.totalTrips.textContent = String(trips.length);
-      els.morningCount.textContent = String(morningTrips.length);
-      els.afternoonCount.textContent = String(afternoonTrips.length);
-      els.lspCount.textContent = String(lsps.length);
-      els.lspList.textContent = lsps.join(' · ') || '-';
-      els.footerSource.textContent = 'Nguồn dữ liệu: ' + label + ' · tự làm mới mỗi 60 giây';
-
-      renderPage(0);
-      startPageFlip();
+    function renderDashboard(items, sourceLabel='Google Sheets Published CSV') {
+      latestTrips = groupTrips(items);
+      currentPages = chunkTrips(latestTrips, TRIPS_PER_PAGE);
+      currentPageIndex = 0;
+      renderHeaderSummary(latestTrips);
+      renderPage(currentPages[0] || []);
+      els.footerLeft.textContent = `Nguồn dữ liệu: ${sourceLabel}`;
+      startFlip();
     }
 
     async function fetchCsvText(url) {
-      const res = await fetch(url, { method: 'GET', mode: 'cors', cache: 'no-store' });
-      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const res = await fetch(url, { method:'GET', mode:'cors', cache:'no-store' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return await res.text();
     }
 
@@ -673,22 +502,13 @@
       return items;
     }
 
-    function useSampleData(reason) {
-      renderFromCsvText(SAMPLE_CSV, 'Dữ liệu mẫu nội bộ');
-      setStatus('Đang hiển thị dữ liệu mẫu', 'warn');
-      console.warn(reason || 'Không truy cập được Google Sheets từ môi trường hiện tại');
-    }
-
     async function loadRemoteData() {
-      setStatus('Đang tải', 'warn');
-      els.lastUpdated.textContent = formatNow();
       try {
-        const csvText = await fetchCsvText(CSV_URL + '&t=' + Date.now());
+        const csvText = await fetchCsvText(`${CSV_URL}&t=${Date.now()}`);
         renderFromCsvText(csvText, 'Google Sheets Published CSV');
-        setStatus('Đồng bộ OK', 'ok');
       } catch (err) {
         console.error(err);
-        useSampleData(err && err.message ? err.message : 'Lỗi tải dữ liệu');
+        renderFromCsvText(SAMPLE_CSV, 'Dữ liệu mẫu nội bộ');
       }
     }
 
@@ -702,31 +522,29 @@
       console.assert(t1.length === 2 && t1[1][1] === '2', 'Test csvToRows cơ bản thất bại');
 
       const t2 = csvToRows('A,B\n"1,1",2');
-      console.assert(t2[1][0] === '1,1', 'Test csvToRows với dấu phẩy trong quote thất bại');
+      console.assert(t2[1][0] === '1,1', 'Test csvToRows quote thất bại');
 
-      const t3 = parseHourMinute('01:30 PM');
-      console.assert(t3 && t3.hour === 13 && t3.minute === 30, 'Test parseHourMinute PM thất bại');
+      const t3 = parseHourMinute('4:00 PM');
+      console.assert(t3 && t3.hour === 16 && t3.minute === 0, 'Test parseHourMinute PM thất bại');
 
-      const t4 = parseHourMinute('12:00 AM');
-      console.assert(t4 && t4.hour === 0, 'Test parseHourMinute 12AM thất bại');
+      const t4 = formatTimeForBoard('16:00');
+      console.assert(t4 === '4:00 PM', 'Test formatTimeForBoard thất bại');
 
       const mapped = mapRows(csvToRows(SAMPLE_CSV));
-      console.assert(mapped.length === 11, 'Test mapRows số dòng thất bại');
-      console.assert(mapped[0].tripNo === '125' && mapped[1].tripNo === '125', 'Test giữ thứ tự dòng theo sheet thất bại');
+      console.assert(mapped.length === 24, 'Test mapRows số dòng thất bại');
+      console.assert(mapped[1].tripNo === '125' && mapped[2].tripNo === '125', 'Test giữ nguyên thứ tự dòng thất bại');
 
       const grouped = groupTrips(mapped);
-      console.assert(grouped.length === 6, 'Test groupTrips số trip thất bại');
-      console.assert(grouped[0].tripNo === '125' && grouped[0].stores.length === 3, 'Test gộp cửa hàng cùng trip thất bại');
-      console.assert(grouped[0].stores[0].storeId === '1001' && grouped[0].stores[2].storeId === '1011', 'Test thứ tự cửa hàng trong trip thất bại');
+      console.assert(grouped.length === 8, 'Test groupTrips số trip thất bại');
+      console.assert(grouped[1].tripNo === '125' && grouped[1].stores.length === 4, 'Test gộp trip 125 thất bại');
+      console.assert(grouped[1].stores[0].storeName === 'Nguyen Son' && grouped[1].stores[3].storeName === 'Hang Dau', 'Test giữ thứ tự cửa hàng trong trip thất bại');
 
-      const pagesData = buildPages(grouped);
-      console.assert(pagesData.pages.length >= 2, 'Test phân trang thất bại');
-      console.assert(pagesData.morningTrips.length === 3, 'Test chia ca sáng thất bại');
-      console.assert(pagesData.afternoonTrips.length === 3, 'Test chia ca chiều thất bại');
+      const pages = chunkTrips(grouped, TRIPS_PER_PAGE);
+      console.assert(pages.length === 2, 'Test phân trang 6 trip thất bại');
+      console.assert(pages[0].length === 6 && pages[1].length === 2, 'Test số trip mỗi trang thất bại');
     }
 
     runTests();
-    useSampleData('Khởi tạo an toàn trước khi thử kết nối từ xa');
     loadRemoteData();
     scheduleRefresh();
   </script>
