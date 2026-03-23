@@ -1,0 +1,1236 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OUTBOUND PLAN DASHBOARD</title>
+  <style>
+    :root{
+      --bg:#07111f;
+      --panel:#0d1b2d;
+      --panel-2:#11233b;
+      --line:rgba(255,255,255,.08);
+      --text:#eef6ff;
+      --muted:#9fb4cb;
+      --accent:#29b6f6;
+      --accent-2:#78ffd6;
+      --warn:#ffca5c;
+      --good:#7af0a0;
+      --danger:#ff7f7f;
+      --shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+
+    *{box-sizing:border-box}
+    html,body{
+      width:100%; height:100%; margin:0; overflow:hidden;
+      font-family: Arial, "Arial Bold", "Helvetica Neue", sans-serif;
+      font-weight:700;
+      background: radial-gradient(circle at top right, #14335d 0%, var(--bg) 38%, #030814 100%);
+      color:var(--text);
+    }
+
+    .page{
+      width:100vw; height:100vh; padding:.55vw;
+      display:grid; grid-template-rows:auto auto auto 1fr auto;
+      gap:.28vw;
+    }
+
+    .topbar{
+      display:grid; grid-template-columns: 1.3fr auto; align-items:center;
+      gap:.28vw;
+      padding:.4vw .62vw;
+      border:1px solid var(--line);
+      border-radius:1.2vw;
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      box-shadow:var(--shadow);
+    }
+
+    .brand-wrap{display:flex; align-items:center; gap:.9vw; min-width:0}
+    .logo-box{
+      display:flex; align-items:center; justify-content:center;
+      min-width:8.1vw; height:2.35vw; padding:0 .65vw;
+      border-radius:.9vw; background:rgba(255,255,255,.07); border:1px solid var(--line);
+      font-weight:800; letter-spacing:.04em; font-size:.96vw; text-transform:uppercase;
+      white-space:nowrap;
+    }
+    .logo-box.small{min-width:6.8vw}
+    .title{font-size:1.34vw; font-weight:900; line-height:1.02; text-transform:uppercase}
+    .subtitle{margin-top:.08vw; font-size:.68vw; color:var(--muted); font-weight:600}
+
+    .meta{display:flex; gap:.45vw}
+    .meta-card{
+      min-width:7.2vw; padding:.42vw .58vw;
+      border:1px solid var(--line); border-radius:.95vw;
+      background:rgba(255,255,255,.05);
+    }
+    .meta-label{font-size:.56vw; color:var(--muted); font-weight:800; text-transform:uppercase; letter-spacing:.08em}
+    .meta-value{font-size:.95vw; font-weight:900; margin-top:.1vw}
+
+    .summary-row{
+      display:grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap:clamp(6px, .3vw, 12px);
+      align-items:stretch;
+    }
+    .summary-card{
+      border:1px solid var(--line); border-radius:.85vw; padding:.28vw .48vw;
+      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.025));
+      box-shadow:var(--shadow);
+      min-height:4.6vh;
+      display:grid;
+      grid-template-rows:auto auto;
+      gap:.12vw;
+    }
+    .summary-head{display:flex; align-items:baseline; justify-content:space-between; gap:.5vw}
+    .summary-label{font-size:clamp(14px, .8vw, 18px); color:var(--muted); font-weight:800; text-transform:uppercase; letter-spacing:.08em}
+    .summary-value{font-size:clamp(28px, 1.6vw, 40px); font-weight:900; line-height:1; text-align:right; margin:0}
+    .summary-note{font-size:clamp(14px, .8vw, 18px); color:#dce9f7; line-height:1.2;}
+    .summary-note.hidden{visibility:hidden}
+
+    .page-info{
+      display:grid; grid-template-columns: 1fr auto auto auto;
+      gap:.28vw;
+      align-items:center;
+    }
+    .page-banner,.page-stat{
+      border:1px solid var(--line); border-radius:1vw;
+      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.025));
+      box-shadow:var(--shadow);
+      padding:.34vw .48vw;
+    }
+    .page-banner-title{font-size:.9vw; font-weight:900; text-transform:uppercase}
+    .page-banner-sub{font-size:.64vw; color:var(--muted); margin-top:.06vw; font-weight:700}
+    .page-stat-label{font-size:.52vw; color:var(--muted); font-weight:800; text-transform:uppercase; letter-spacing:.08em}
+    .page-stat-value{font-size:.88vw; font-weight:900; margin-top:.04vw}
+
+    .board{
+      position:relative;
+      border:1px solid var(--line); border-radius:1.2vw;
+      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.025));
+      box-shadow:var(--shadow);
+      padding:.36vw;
+      min-height:0;
+      overflow:hidden;
+    }
+
+    .board-stage{position:relative; width:100%; height:100%;}
+
+    .trip-grid{
+      display:grid;
+      grid-template-columns:repeat(4, 1fr);
+      grid-template-rows:1fr;
+      gap:clamp(10px, .5vw, 16px);
+      align-items:stretch;
+      height:100%;
+    }
+
+    .trip-card{
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:1vw;
+      background:linear-gradient(180deg, rgba(17,35,59,.98), rgba(11,25,44,.98));
+      padding:clamp(10px, .4vw, 14px);
+      display:flex;
+      flex-direction:column;
+      justify-content:flex-start;
+      height:100%;
+      overflow:hidden;
+    }
+
+    .trip-top{
+      display:grid;
+      grid-template-columns:minmax(0, 1fr) auto;
+      gap:clamp(8px, .35vw, 14px);
+      align-items:start;
+    }
+    .badge{
+      border-radius:.55vw; padding:clamp(6px, .30vw, 9px) clamp(10px, .48vw, 16px); font-weight:900; line-height:1;
+      font-size:clamp(15px, .82vw, 20px); text-transform:uppercase; white-space:nowrap;
+    }
+    .badge.trip{background:rgba(41,182,246,.14); color:#a8e5ff; border:1px solid rgba(41,182,246,.28)}
+    .badge.time{background:linear-gradient(180deg, rgba(122,240,160,.20), rgba(122,240,160,.10)); color:#d8ffe4; border:1px solid rgba(122,240,160,.34); font-size:clamp(18px, 1.05vw, 26px); padding:clamp(6px, .28vw, 10px) clamp(12px, .56vw, 18px); box-shadow:0 0 14px rgba(122,240,160,.12);}
+    .trip-card.afternoon .badge.time{background:rgba(255,190,92,.12); color:#ffe0a3; border:1px solid rgba(255,190,92,.25)}
+    .truck{justify-self:end; align-self:start; font-size:clamp(16px, .95vw, 22px); line-height:1.05; color:#d7e7f7; font-weight:900; white-space:nowrap;}
+
+    .trip-headline{
+      display:block;
+      display:none;
+    }
+    .trip-route{
+      font-size:.9vw; font-weight:900; line-height:1.04;
+      display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+    }
+    .trip-count{
+      font-size:.86vw; font-weight:900; color:#dff6ff; white-space:nowrap;
+    }
+    .badge.meta-inline{background:rgba(255,255,255,.06); color:#eef6ff; border:1px solid rgba(255,255,255,.12)}
+
+    .store-list{
+      min-height:0;
+      display:grid;
+      grid-template-columns:1fr;
+      gap:8px;
+    }
+
+    .store-row {
+  display:grid;
+  grid-template-columns:112px 1fr;
+  align-items:center;
+  gap:12px;
+  padding:8px 12px;
+}
+    .store-seq {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size: clamp(20px, 1.18vw, 28px);
+  font-weight:900;
+  color:#9de7ff;
+  text-transform:uppercase;
+  background:rgba(41,182,246,.15);
+  border:1px solid rgba(41,182,246,.35);
+  border-radius:12px;
+  padding:8px 12px;
+  min-width:104px;
+  height:100%;
+  white-space:nowrap;
+}
+    .store-main{min-width:0}
+    .store-name{
+      font-size:clamp(21px, 1.24vw, 29px); font-weight:900; line-height:1.1;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .store-row.more-stores{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      background:rgba(255,202,92,.08);
+      border:1px dashed rgba(255,202,92,.26);
+    }
+    .store-row.more-stores .store-name{font-size:.82vw; white-space:normal}
+    .lsp-inline{display:flex; align-items:baseline; justify-content:space-between; gap:.5vw}
+    .lsp-inline .summary-note{font-size:clamp(14px, .8vw, 18px); color:#dce9f7; line-height:1.2;}
+    .store-id{display:none}
+    .store-point,.store-lsp{display:none}
+    .store-point-label,.store-lsp-label{display:none}
+    .store-point-value,.store-lsp-value{display:none}
+
+    .empty{
+      height:100%; display:flex; align-items:center; justify-content:center; text-align:center;
+      font-size:1.2vw; color:var(--muted); font-weight:700; padding:2vw;
+    }
+
+    .footer{
+      display:grid; grid-template-columns:1fr auto;
+      gap:.5vw;
+      align-items:center;
+      font-size:.6vw; color:#89a3be;
+      padding:0 .1vw;
+    }
+
+    .status-inline{display:flex; align-items:center; gap:.4vw}
+    .status-dot{
+      width:.58vw; height:.58vw; border-radius:999px; display:inline-block;
+      background:var(--good); box-shadow:0 0 12px rgba(122,240,160,.55);
+    }
+
+    .playback-indicator{
+      position:fixed;
+      right:1vw;
+      bottom:1vw;
+      z-index:50;
+      display:flex;
+      align-items:center;
+      gap:.45vw;
+      padding:.5vw .72vw;
+      border-radius:.9vw;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(5,12,23,.78);
+      backdrop-filter:blur(8px);
+      box-shadow:var(--shadow);
+      font-size:.72vw;
+      font-weight:800;
+      color:#eef6ff;
+      user-select:none;
+      pointer-events:none;
+    }
+    .playback-indicator .icon{font-size:.9vw; line-height:1}
+    .playback-indicator.paused{color:#ffe0a3; border-color:rgba(255,190,92,.28)}
+    .status-dot.warn{background:var(--warn); box-shadow:0 0 12px rgba(255,202,92,.45)}
+    .status-dot.danger{background:var(--danger); box-shadow:0 0 12px rgba(255,127,127,.45)}
+
+    .grid-panel{
+      position:absolute; inset:0;
+      padding:.36vw;
+    }
+    .grid-panel.enter-left{animation:slideInLeft .7s ease both}
+    .grid-panel.enter-up{animation:slideInUp .7s ease both}
+    .grid-panel.exit-left{animation:slideOutLeft .7s ease both}
+    .grid-panel.exit-up{animation:slideOutUp .7s ease both}
+
+    @keyframes slideInLeft {from{transform:translateX(100%);opacity:.18} to{transform:translateX(0);opacity:1}}
+    @keyframes slideOutLeft {from{transform:translateX(0);opacity:1} to{transform:translateX(-100%);opacity:.08}}
+    @keyframes slideInUp {from{transform:translateY(100%);opacity:.18} to{transform:translateY(0);opacity:1}}
+    @keyframes slideOutUp {from{transform:translateY(0);opacity:1} to{transform:translateY(-100%);opacity:.08}}
+
+    @media (max-width: 1200px){
+      .title{font-size:30px}.subtitle{font-size:14px}.logo-box{height:52px;font-size:14px;min-width:150px}
+      .meta-label,.summary-label,.page-stat-label,.store-point-label,.store-lsp-label,.store-id{font-size:10px}
+      .meta-value,.page-stat-value{font-size:18px}.summary-value{font-size:clamp(28px, 1.6vw, 40px); font-weight:900; line-height:1; text-align:right; margin:0}.summary-note,.page-banner-sub{font-size:13px}
+      .summary-head{gap:12px}
+      .page-banner-title{font-size:22px}.trip-route{font-size:18px}.trip-count{font-size:16px}
+      .store-name,.truck,.badge{font-size:14px}.store-point-value,.store-lsp-value,.store-seq{font-size:13px}
+      .store-list{grid-template-columns:1fr}
+    }
+  
+.store-row.active .store-seq{
+  animation:pulse 1.5s infinite;
+  background:linear-gradient(90deg,#29b6f6,#78ffd6);
+  color:#002;
+}
+@keyframes pulse{
+  0%{box-shadow:0 0 0 0 rgba(41,182,246,.6)}
+  70%{box-shadow:0 0 0 10px rgba(41,182,246,0)}
+  100%{box-shadow:0 0 0 0 rgba(41,182,246,0)}
+}
+
+
+
+.store-row:nth-child(odd) .store-seq{
+  background:rgba(41,182,246,.18);
+}
+.store-row:nth-child(even) .store-seq{
+  background:rgba(120,255,214,.18);
+}
+
+</style>
+
+<style>
+.board{
+  overflow:hidden;
+}
+.grid-panel{
+  padding:6px;
+}
+
+
+
+
+
+
+.trip-empty{
+  min-height:180px;
+}
+@media (min-width: 1920px){
+  
+  
+  
+  
+  
+  
+}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const cards = document.querySelectorAll('.trip-card');
+  cards.forEach(card => {
+    const storeRows = card.querySelectorAll('.store-row:not(.more-stores)');
+    const count = Math.min(storeRows.length, 6);
+    card.setAttribute('data-store-count', String(count || 1));
+  });
+});
+</script>
+
+
+<style>
+.badge.meta-inline{display:none !important;}
+.trip-headline{display:none !important;}
+</style>
+
+
+<style>
+.truck{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:10px;
+  flex-wrap:nowrap;
+}
+.lsp-tag,
+.truck-tag{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:999px;
+  padding:6px 10px;
+  font-size:clamp(16px, .95vw, 22px);
+  line-height:1;
+  font-weight:900;
+  white-space:nowrap;
+  border:1px solid rgba(255,255,255,.14);
+}
+.lsp-tag.lsp-gsc{
+  background:rgba(41,182,246,.14);
+  color:#9de7ff;
+  border-color:rgba(41,182,246,.34);
+}
+.lsp-tag.lsp-fml{
+  background:rgba(120,255,214,.12);
+  color:#d8ffe4;
+  border-color:rgba(120,255,214,.32);
+}
+.lsp-tag.lsp-ghtk{
+  background:rgba(255,190,92,.12);
+  color:#ffe0a3;
+  border-color:rgba(255,190,92,.28);
+}
+.lsp-tag.lsp-default{
+  background:rgba(255,255,255,.06);
+  color:#eef6ff;
+}
+.truck-tag{
+  background:rgba(255,255,255,.06);
+  color:#eef6ff;
+}
+.truck-icon{
+  margin-right:6px;
+  opacity:.95;
+}
+</style>
+
+</head>
+<body>
+  <div class="page">
+    <section class="topbar">
+      <div class="brand-wrap">
+        <div class="logo-box">Cello Square</div>
+        <div class="logo-box small">Samsung SDS</div>
+        <div>
+          <div class="title">OUTBOUND PLAN DASHBOARD</div>
+          
+        </div>
+      </div>
+      <div class="meta">
+        <div class="meta-card">
+          <div class="meta-label">Ngày kế hoạch</div>
+          <div id="planDate" class="meta-value">--/--/----</div>
+        </div>
+        <div class="meta-card">
+          <div class="meta-label">Cập nhật</div>
+          <div id="lastUpdated" class="meta-value">--:--:--</div>
+        </div>
+        <div class="meta-card">
+          <div class="meta-label">Trạng thái</div>
+          <div class="meta-value"><span id="statusDot" class="status-dot"></span><span id="syncStatus">Loading</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="summary-row">
+      <div class="summary-card">
+        <div class="summary-head">
+          <div class="summary-label">Tổng số cửa hàng</div>
+          <div id="totalStops" class="summary-value">0</div>
+        </div>
+        <div class="summary-note hidden">&nbsp;</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-head">
+          <div class="summary-label">Tổng chuyến</div>
+          <div id="totalTrips" class="summary-value">0</div>
+        </div>
+        <div class="summary-note hidden">&nbsp;</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-head">
+          <div class="summary-label">Ca sáng</div>
+          <div id="morningCount" class="summary-value">0</div>
+        </div>
+        <div class="summary-note hidden">&nbsp;</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-head">
+          <div class="summary-label">Ca chiều</div>
+          <div id="afternoonCount" class="summary-value">0</div>
+        </div>
+        <div class="summary-note hidden">&nbsp;</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-head">
+          <div class="summary-label">LSP</div>
+          <div id="lspCount" class="summary-value">0</div>
+        </div>
+        <div class="summary-note"><span id="lspList">-</span></div>
+      </div>
+    </section>
+
+    <section class="page-info">
+      <div class="page-banner">
+        <div id="pageTitle" class="page-banner-title">Ca sáng</div>
+        <div id="pageSubTitle" class="page-banner-sub">Trang 1 / 1</div>
+      </div>
+      <div class="page-stat">
+        <div class="page-stat-label">Trip trên trang</div>
+        <div id="pageTripCount" class="page-stat-value">0</div>
+      </div>
+      <div class="page-stat">
+        <div class="page-stat-label">Điểm giao trên trang</div>
+        <div id="pageStopCount" class="page-stat-value">0</div>
+      </div>
+      <div class="page-stat">
+        <div class="page-stat-label">Lật trang</div>
+        <div id="pageFlipEvery" class="page-stat-value">15s</div>
+      </div>
+    </section>
+
+    <section class="board">
+      <div id="boardStage" class="board-stage"><div id="tripGrid" class="trip-grid grid-panel"></div></div>
+    </section>
+
+    <section class="footer">
+      <div id="footerSource">Nguồn dữ liệu: Google Sheet trực tiếp · tự làm mới mỗi 60 giây</div>
+      <div class="status-inline">
+        <span>Hiển thị 6 trip / trang · tối đa 6 cửa hàng / trip</span>
+        <span>•</span>
+        <span>Auto flip</span>
+      </div>
+    </section>
+  </div>
+
+  <div id="playbackIndicator" class="playback-indicator"><span id="playbackIcon" class="icon">▶</span><span id="playbackText">Auto flip đang chạy · chạm để dừng</span></div>
+
+  <script src="https://www.gstatic.com/charts/loader.js"></script>
+  <script>
+    const SHEET_ID = '15Jtivb-WUwwTUYTN6pbV3cPzGQ1-fqku93RaKiLzCS8';
+    const SHEET_GID = '358090930';
+    const CSV_URL = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/export?format=csv&gid=' + SHEET_GID;
+    const REFRESH_MS = 60000;
+    const PAGE_FLIP_MS = 15000;
+    const TRIPS_PER_PAGE = 4;
+    const ANIMATION_MS = 700;
+    const TZ = 'Asia/Bangkok';
+
+    const SAMPLE_CSV = `DATE,TRIP NO.,PICKUP TIME (PLAN),TRUCK TYPE,STORE ID,STORE NAME,DELIVERY POINT,LSP
+23/03/2026,125,08:00,4W,1001,MM Mega Market An Phú,12,Samsung SDS
+23/03/2026,125,08:00,4W,1007,MM Mega Market Thủ Đức,5,Samsung SDS
+23/03/2026,125,08:00,4W,1011,MM Mega Market Biên Hòa,3,Samsung SDS
+23/03/2026,128,09:30,4W,1002,MM Mega Market Bình Phú,8,Samsung SDS
+23/03/2026,128,09:30,4W,1012,MM Mega Market Tân Phú,6,Samsung SDS
+23/03/2026,130,11:15,2T,1003,MM Mega Market Hiệp Phú,6,Cello Square
+23/03/2026,131,13:30,4W,1004,MM Mega Market Hà Đông,10,Cello Square
+23/03/2026,131,13:30,4W,1013,MM Mega Market Hoàng Mai,4,Cello Square
+23/03/2026,133,15:00,2T,1005,MM Mega Market Long Biên,7,Samsung SDS
+23/03/2026,133,15:00,2T,1009,MM Mega Market Thanh Xuân,3,Samsung SDS
+23/03/2026,136,17:00,4W,1006,MM Mega Market Thăng Long,9,Cello Square`;
+
+    const els = {
+      planDate: document.getElementById('planDate'),
+      lastUpdated: document.getElementById('lastUpdated'),
+      syncStatus: document.getElementById('syncStatus'),
+      statusDot: document.getElementById('statusDot'),
+      totalStops: document.getElementById('totalStops'),
+      totalTrips: document.getElementById('totalTrips'),
+      morningCount: document.getElementById('morningCount'),
+      afternoonCount: document.getElementById('afternoonCount'),
+      lspCount: document.getElementById('lspCount'),
+      lspList: document.getElementById('lspList'),
+      pageTitle: document.getElementById('pageTitle'),
+      pageSubTitle: document.getElementById('pageSubTitle'),
+      pageTripCount: document.getElementById('pageTripCount'),
+      pageStopCount: document.getElementById('pageStopCount'),
+      pageFlipEvery: document.getElementById('pageFlipEvery'),
+      boardStage: document.getElementById('boardStage'),
+      tripGrid: document.getElementById('tripGrid'),
+      footerSource: document.getElementById('footerSource'),
+      playbackIndicator: document.getElementById('playbackIndicator'),
+      playbackIcon: document.getElementById('playbackIcon'),
+      playbackText: document.getElementById('playbackText')
+    };
+
+    let refreshTimer = null;
+    let flipTimer = null;
+    let isFlipPaused = false;
+    let pageState = { pages: [], currentIndex: 0 };
+
+
+
+    function getLspClass(value) {
+      const raw = String(value || '').trim().toLowerCase();
+      if (raw.includes('gsc')) return 'lsp-gsc';
+      if (raw.includes('fml')) return 'lsp-fml';
+      if (raw.includes('ghtk')) return 'lsp-ghtk';
+      return 'lsp-default';
+    }
+
+    function formatTruckType(value) {
+      const raw = String(value || '').trim();
+      if (!raw) return '-';
+      const lower = raw.toLowerCase();
+      if (lower.includes('ton')) return raw;
+      if (/^\d+(\.\d+)?t$/.test(lower)) return raw.slice(0, -1) + ' Ton';
+      if (/^\d+(\.\d+)?$/.test(raw)) return raw + ' Ton';
+      return raw;
+    }
+
+    function formatNow() {
+      return new Date().toLocaleTimeString('vi-VN', { hour12:false, timeZone: TZ });
+    }
+
+    function setStatus(text, type) {
+      const statusType = type || 'ok';
+      els.syncStatus.textContent = text;
+      els.statusDot.className = 'status-dot';
+      if (statusType === 'warn') els.statusDot.classList.add('warn');
+      if (statusType === 'danger') els.statusDot.classList.add('danger');
+    }
+
+    function csvToRows(csv) {
+      const rows = [];
+      let row = [];
+      let value = '';
+      let inQuotes = false;
+
+      for (let i = 0; i < csv.length; i++) {
+        const ch = csv[i];
+        const next = csv[i + 1];
+
+        if (ch === '"') {
+          if (inQuotes && next === '"') {
+            value += '"';
+            i++;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (ch === ',' && !inQuotes) {
+          row.push(value);
+          value = '';
+        } else if ((ch === '\n' || ch === '\r') && !inQuotes) {
+          if (ch === '\r' && next === '\n') i++;
+          row.push(value);
+          if (row.some(function(cell){ return String(cell).trim() !== ''; })) rows.push(row);
+          row = [];
+          value = '';
+        } else {
+          value += ch;
+        }
+      }
+
+      if (value.length || row.length) {
+        row.push(value);
+        if (row.some(function(cell){ return String(cell).trim() !== ''; })) rows.push(row);
+      }
+
+      return rows;
+    }
+
+    function normalizeTime(text) {
+      return String(text || '').replace(/\s+/g, ' ').trim().toUpperCase();
+    }
+
+    function parseHourMinute(text) {
+      const m = normalizeTime(text).match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
+      if (!m) return null;
+      let hour = Number(m[1]);
+      const minute = Number(m[2]);
+      const ampm = (m[3] || '').toUpperCase();
+      if (ampm === 'PM' && hour < 12) hour += 12;
+      if (ampm === 'AM' && hour === 12) hour = 0;
+      return { hour: hour, minute: minute, total: hour * 60 + minute };
+    }
+
+    function toDisplayDate(dateStr) {
+      const t = String(dateStr || '').trim();
+      if (/^\d{2}\/\d{2}\/\d{4}$/.test(t)) return t;
+      return t || '--/--/----';
+    }
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
+
+    function pickHeaderAndRows(rows) {
+      let headerIndex = rows.findIndex(function(r){
+        const c0 = String(r[0] || '').trim().toUpperCase();
+        const c1 = String(r[1] || '').trim().toUpperCase();
+        return c0 === 'DATE' && c1.indexOf('TRIP') >= 0;
+      });
+
+      if (headerIndex < 0) headerIndex = 0;
+
+      const data = rows.slice(headerIndex + 1).filter(function(r){
+        return r.some(function(cell){ return String(cell).trim() !== ''; });
+      });
+
+      return { data: data };
+    }
+
+    function mapRows(rows) {
+      const data = pickHeaderAndRows(rows).data;
+      return data.map(function(r, index){
+        return {
+          rowIndex: index,
+          date: (r[0] || '').trim(),
+          tripNo: (r[1] || '').trim(),
+          pickupTime: (r[2] || '').trim(),
+          truckType: (r[3] || '').trim(),
+          storeId: (r[4] || '').trim(),
+          storeName: (r[5] || '').trim(),
+          deliveryPoint: (r[6] || '').trim(),
+          lsp: (r[7] || '').trim()
+        };
+      }).filter(function(x){
+        return x.tripNo && x.pickupTime && (x.storeName || x.storeId);
+      });
+    }
+
+    function groupTrips(items) {
+      const tripMap = new Map();
+      const trips = [];
+
+      items.forEach(function(item){
+        const key = String(item.tripNo).trim();
+        if (!tripMap.has(key)) {
+          const trip = {
+            tripNo: item.tripNo,
+            pickupTime: item.pickupTime,
+            truckType: item.truckType,
+            lsp: item.lsp,
+            date: item.date,
+            orderIndex: item.rowIndex,
+            pickupTotal: (parseHourMinute(item.pickupTime) || {}).total || 9999,
+            stores: []
+          };
+          tripMap.set(key, trip);
+          trips.push(trip);
+        }
+
+        tripMap.get(key).stores.push({
+          storeId: item.storeId,
+          storeName: item.storeName,
+          deliveryPoint: item.deliveryPoint,
+          lsp: item.lsp
+        });
+      });
+
+      return trips.sort(function(a, b){ return a.orderIndex - b.orderIndex; });
+    }
+
+    function paginateTrips(trips, periodKey, periodLabel) {
+      const pages = [];
+      for (let i = 0; i < trips.length; i += TRIPS_PER_PAGE) {
+        pages.push({
+          periodKey: periodKey,
+          periodLabel: periodLabel,
+          trips: trips.slice(i, i + TRIPS_PER_PAGE)
+        });
+      }
+      return pages;
+    }
+
+    function buildPages(trips) {
+      const morningTrips = trips.filter(function(x){
+        const parsed = parseHourMinute(x.pickupTime);
+        return (parsed ? parsed.hour : 0) < 12;
+      });
+      const afternoonTrips = trips.filter(function(x){
+        const parsed = parseHourMinute(x.pickupTime);
+        return (parsed ? parsed.hour : 0) >= 12;
+      });
+
+      return {
+        pages: paginateTrips(morningTrips, 'morning', 'Số chuyến Ca sáng').concat(
+          paginateTrips(afternoonTrips, 'afternoon', 'Số chuyến Ca chiều')
+        ),
+        morningTrips: morningTrips,
+        afternoonTrips: afternoonTrips
+      };
+    }
+
+    function createStoreRow(store, index) {
+      const row = document.createElement('div');
+      row.className = 'store-row';
+      row.innerHTML =
+        '<div class="store-seq">STOP ' + escapeHtml(index + 1) + '</div>' +
+        '<div class="store-main">' +
+          '<div class="store-name">' + escapeHtml(store.storeName || '-') + '</div>' +
+        '</div>';
+      return row;
+    }
+
+    function createMoreStoresRow(hiddenCount) {
+      const row = document.createElement('div');
+      row.className = 'store-row more-stores';
+      row.innerHTML =
+        '<div class="store-main">' +
+          '<div class="store-name">+' + escapeHtml(hiddenCount) + ' cửa hàng nữa</div>' +
+        '</div>';
+      return row;
+    }
+
+    function createTripCard(trip, periodKey) {
+      const card = document.createElement('article');
+      card.className = 'trip-card ' + periodKey;
+
+      const routeText = trip.stores.map(function(store){
+        return store.storeName || store.storeId || '-';
+      }).join(' • ');
+
+      const top = document.createElement('div');
+      top.className = 'trip-top';
+      top.innerHTML =
+        '<span class="badge time">Giờ xuất ' + escapeHtml(trip.pickupTime) + '</span>' +
+        '<div class="truck">' +
+          '<span class="lsp-tag ' + getLspClass(trip.lsp || '-') + '">LSP ' + escapeHtml(trip.lsp || '-') + '</span>' +
+          '<span class="truck-tag"><span class="truck-icon">🚚</span>' + escapeHtml(formatTruckType(trip.truckType || '-')) + '</span>' +
+        '</div>';
+
+      const head = document.createElement('div');
+      head.className = 'trip-headline';
+      head.innerHTML =
+        '';
+
+      const list = document.createElement('div');
+      list.className = 'store-list';
+      const renderStores = trip.stores;
+
+      renderStores.forEach(function(store, index){
+        list.appendChild(createStoreRow(store, index));
+      });
+
+      card.appendChild(top);
+      card.appendChild(head);
+      card.appendChild(list);
+      return card;
+    }
+
+    function renderPage(index) {
+      const totalPages = pageState.pages.length;
+
+      if (!totalPages) {
+        els.tripGrid.innerHTML = '<div class="empty">Không có dữ liệu hợp lệ</div>';
+        els.pageTitle.textContent = 'Không có dữ liệu';
+        els.pageSubTitle.textContent = 'Trang 0 / 0';
+        els.pageTripCount.textContent = '0';
+        els.pageStopCount.textContent = '0';
+        return;
+      }
+
+      const prevPage = pageState.pages[pageState.currentIndex] || null;
+      pageState.currentIndex = ((index % totalPages) + totalPages) % totalPages;
+      const page = pageState.pages[pageState.currentIndex];
+      const stopCount = page.trips.reduce(function(sum, trip){
+        return sum + trip.stores.length;
+      }, 0);
+
+      els.pageTitle.textContent = page.periodLabel;
+      els.pageSubTitle.textContent = 'Màn hình ' + (page.periodKey === 'morning' ? 'ca sáng' : 'ca chiều') + ' · Trang ' + (pageState.currentIndex + 1) + ' / ' + totalPages;
+      els.pageTripCount.textContent = String(page.trips.length);
+      els.pageStopCount.textContent = String(stopCount);
+      els.pageFlipEvery.textContent = String(PAGE_FLIP_MS / 1000) + 's';
+
+      const nextGrid = document.createElement('div');
+      const motion = prevPage && prevPage.periodKey !== page.periodKey ? 'up' : 'left';
+      nextGrid.className = 'trip-grid grid-panel enter-' + motion;
+      nextGrid.id = 'tripGrid';
+      page.trips.forEach(function(trip){
+        nextGrid.appendChild(createTripCard(trip, page.periodKey));
+      });
+
+      const emptySlots = TRIPS_PER_PAGE - page.trips.length;
+      for (let i = 0; i < emptySlots; i++) {
+        const filler = document.createElement('div');
+        filler.className = 'trip-card';
+        filler.style.opacity = '.12';
+        filler.innerHTML = '<div class="empty">Trống</div>';
+        nextGrid.appendChild(filler);
+      }
+
+      const currentGrid = els.tripGrid;
+      if (currentGrid && currentGrid.parentNode) {
+        currentGrid.className = 'trip-grid grid-panel exit-' + motion;
+        els.boardStage.appendChild(nextGrid);
+        els.tripGrid = nextGrid;
+        setTimeout(function(){
+          if (currentGrid && currentGrid.parentNode) currentGrid.parentNode.removeChild(currentGrid);
+        }, ANIMATION_MS);
+      } else {
+        els.boardStage.appendChild(nextGrid);
+        els.tripGrid = nextGrid;
+      }
+    }
+
+    function updatePlaybackIndicator() {
+      const canFlip = pageState.pages.length > 1;
+      const paused = isFlipPaused || !canFlip;
+      els.playbackIndicator.classList.toggle('paused', paused);
+      els.playbackIcon.textContent = paused ? '⏸' : '▶';
+
+      if (!canFlip) {
+        els.playbackText.textContent = 'Chỉ có 1 trang · không cần auto flip';
+        return;
+      }
+
+      els.playbackText.textContent = paused
+        ? 'Đang dừng tại màn hình hiện tại · chạm để chạy tiếp'
+        : 'Auto flip đang chạy · chạm để dừng';
+    }
+
+    function stopPageFlip() {
+      if (flipTimer) {
+        clearInterval(flipTimer);
+        flipTimer = null;
+      }
+      updatePlaybackIndicator();
+    }
+
+    function startPageFlip() {
+      if (flipTimer) clearInterval(flipTimer);
+      if (isFlipPaused || pageState.pages.length <= 1) {
+        flipTimer = null;
+        updatePlaybackIndicator();
+        return;
+      }
+      flipTimer = setInterval(function(){
+        renderPage(pageState.currentIndex + 1);
+      }, PAGE_FLIP_MS);
+      updatePlaybackIndicator();
+    }
+
+    function togglePageFlip() {
+      isFlipPaused = !isFlipPaused;
+      if (isFlipPaused) {
+        stopPageFlip();
+      } else {
+        startPageFlip();
+      }
+    }
+
+    function renderDashboard(items, sourceLabel) {
+      const label = sourceLabel || 'Google Sheets Published CSV';
+      const trips = groupTrips(items);
+      const built = buildPages(trips);
+      const pages = built.pages;
+      const morningTrips = built.morningTrips;
+      const afternoonTrips = built.afternoonTrips;
+      const lsps = Array.from(new Set(items.map(function(x){ return x.lsp; }).filter(Boolean)));
+      const planDate = items[0] ? items[0].date : '';
+
+      pageState.pages = pages;
+      pageState.currentIndex = 0;
+
+      els.planDate.textContent = toDisplayDate(planDate);
+      els.lastUpdated.textContent = formatNow();
+      els.totalStops.textContent = String(items.length);
+      els.totalTrips.textContent = String(trips.length);
+      els.morningCount.textContent = String(morningTrips.length);
+      els.afternoonCount.textContent = String(afternoonTrips.length);
+      els.lspCount.textContent = String(lsps.length);
+      els.lspList.textContent = lsps.join(' · ') || '-';
+      els.footerSource.textContent = 'Nguồn dữ liệu: ' + label + ' · tự làm mới mỗi 60 giây';
+
+      renderPage(0);
+      startPageFlip();
+      updatePlaybackIndicator();
+    }
+
+    async function fetchCsvText(url) {
+      const res = await fetch(url, { method: 'GET', mode: 'cors', cache: 'no-store' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return await res.text();
+    }
+
+    function renderFromCsvText(csvText, sourceLabel) {
+      const rows = csvToRows(csvText);
+      const items = mapRows(rows);
+      if (!items.length) throw new Error('Không tìm thấy dòng dữ liệu hợp lệ trong CSV');
+      renderDashboard(items, sourceLabel);
+      return items;
+    }
+
+    function useSampleData(reason) {
+      renderFromCsvText(SAMPLE_CSV, 'Dữ liệu mẫu nội bộ');
+      setStatus('Đang hiển thị dữ liệu mẫu', 'warn');
+      console.warn(reason || 'Không truy cập được Google Sheets từ môi trường hiện tại');
+    }
+
+    function rowsFromGoogleTable(table) {
+      const rows = [];
+      const colCount = table.getNumberOfColumns();
+      const rowCount = table.getNumberOfRows();
+      const headers = [];
+
+      for (let c = 0; c < colCount; c++) {
+        headers.push(String(table.getColumnLabel(c) || table.getColumnId(c) || '').trim());
+      }
+      rows.push(headers);
+
+      for (let r = 0; r < rowCount; r++) {
+        const row = [];
+        for (let c = 0; c < colCount; c++) {
+          const formatted = table.getFormattedValue(r, c);
+          const raw = table.getValue(r, c);
+          row.push(String(formatted != null && formatted !== '' ? formatted : (raw != null ? raw : '')).trim());
+        }
+        rows.push(row);
+      }
+      return rows;
+    }
+
+    function fetchGoogleSheetViaGviz() {
+      return new Promise(function(resolve, reject){
+        if (!window.google || !google.charts || !google.visualization) {
+          reject(new Error('Google Charts chưa sẵn sàng'));
+          return;
+        }
+
+        const url = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?gid=' + SHEET_GID + '&headers=1&tqx=' + encodeURIComponent('out:json');
+        const query = new google.visualization.Query(url);
+        query.send(function(response){
+          if (response.isError()) {
+            reject(new Error(response.getMessage() || 'Lỗi truy vấn Google Visualization'));
+            return;
+          }
+          try {
+            const table = response.getDataTable();
+            const rows = rowsFromGoogleTable(table);
+            const items = mapRows(rows);
+            if (!items.length) throw new Error('Không tìm thấy dòng dữ liệu hợp lệ từ Google Sheet');
+            resolve(items);
+          } catch (err) {
+            reject(err);
+          }
+        });
+      });
+    }
+
+    async function loadRemoteData() {
+      setStatus('Đang tải', 'warn');
+      els.lastUpdated.textContent = formatNow();
+      try {
+        const items = await fetchGoogleSheetViaGviz();
+        renderDashboard(items, 'Google Sheet trực tiếp');
+        setStatus(' Đã kết nối', 'ok');
+      } catch (gvizErr) {
+        console.warn('GViz lỗi, thử CSV export...', gvizErr);
+        try {
+          const csvText = await fetchCsvText(CSV_URL + '&t=' + Date.now());
+          renderFromCsvText(csvText, 'Google Sheet CSV export');
+          setStatus(' Đã kết nối', 'ok');
+        } catch (csvErr) {
+          console.error(csvErr);
+          useSampleData((csvErr && csvErr.message) || (gvizErr && gvizErr.message) || 'Lỗi tải dữ liệu');
+        }
+      }
+    }
+
+    function scheduleRefresh() {
+      if (refreshTimer) clearInterval(refreshTimer);
+      refreshTimer = setInterval(loadRemoteData, REFRESH_MS);
+    }
+
+    document.addEventListener('click', function(){
+      togglePageFlip();
+    });
+
+    function runTests() {
+      const t1 = csvToRows('A,B\n1,2');
+      console.assert(t1.length === 2 && t1[1][1] === '2', 'Test csvToRows cơ bản thất bại');
+
+      const t2 = csvToRows('A,B\n"1,1",2');
+      console.assert(t2[1][0] === '1,1', 'Test csvToRows với dấu phẩy trong quote thất bại');
+
+      const t3 = parseHourMinute('01:30 PM');
+      console.assert(t3 && t3.hour === 13 && t3.minute === 30, 'Test parseHourMinute PM thất bại');
+
+      const t4 = parseHourMinute('12:00 AM');
+      console.assert(t4 && t4.hour === 0, 'Test parseHourMinute 12AM thất bại');
+
+      const mapped = mapRows(csvToRows(SAMPLE_CSV));
+      console.assert(mapped.length === 11, 'Test mapRows số dòng thất bại');
+      console.assert(mapped[0].tripNo === '125' && mapped[1].tripNo === '125', 'Test giữ thứ tự dòng theo sheet thất bại');
+
+      const grouped = groupTrips(mapped);
+      console.assert(grouped.length === 6, 'Test groupTrips số trip thất bại');
+      console.assert(grouped[0].tripNo === '125' && grouped[0].stores.length === 3, 'Test gộp cửa hàng cùng trip thất bại');
+      console.assert(grouped[0].stores[0].storeId === '1001' && grouped[0].stores[2].storeId === '1011', 'Test thứ tự cửa hàng trong trip thất bại');
+
+      const pagesData = buildPages(grouped);
+      console.assert(pagesData.pages.length >= 2, 'Test phân trang thất bại');
+      console.assert(pagesData.morningTrips.length === 3, 'Test chia ca sáng thất bại');
+      console.assert(pagesData.afternoonTrips.length === 3, 'Test chia ca chiều thất bại');
+    }
+
+    runTests();
+    useSampleData('Khởi tạo an toàn trước khi thử kết nối từ xa');
+    google.charts.load('current', { packages:['table'] });
+    google.charts.setOnLoadCallback(function(){
+      loadRemoteData();
+      scheduleRefresh();
+    });
+  </script>
+</body>
+</html>
+
+<style>
+.summary-card{
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.summary-note{
+  white-space:nowrap;
+}
+</style>
+
+<style>
+.trip-card.morning{min-height:0;}
+</style>
+
+<style>
+.store-list{
+  overflow:hidden;
+}
+
+.trip-card{
+  max-height:100%;
+}
+
+.store-list{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  flex:1;
+}
+</style>
+
+<style>
+
+
+/* 4 cột mỗi màn hình */
+.trip-grid{
+  display:grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  grid-template-rows: 1fr !important;
+  gap: clamp(10px, .5vw, 16px) !important;
+  align-items: stretch !important;
+  height: 100% !important;
+}
+
+/* Ẩn nhãn ca sáng/ca chiều ở banner */
+.page-banner-sub{font-size:clamp(11px, .64vw, 14px); color:var(--muted); margin-top:.06vw; font-weight:700}
+
+/* card fit đều màn hình */
+.trip-card{
+  height:100% !important;
+  overflow:hidden;
+}
+
+/* footer indicator vẫn gọn */
+</style>
+
+
+<style>
+/* ===== TV WHITE MODE ===== */
+html, body {
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+.page {
+  background: #ffffff !important;
+}
+
+.topbar,
+.summary-card,
+.page-banner,
+.page-stat,
+.board,
+.playback-indicator,
+.meta-card {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border-color: #d9d9d9 !important;
+  box-shadow: none !important;
+}
+
+.title,
+.meta-value,
+.summary-value,
+.page-banner-title,
+.page-stat-value,
+#footerSource,
+.status-inline,
+.trip-card,
+.store-name,
+.truck,
+.lsp-tag,
+.truck-tag,
+.badge,
+.page-banner-sub,
+.meta-label,
+.summary-label,
+.page-stat-label,
+.summary-note,
+#playbackText,
+#playbackIcon {
+  color: #000000 !important;
+}
+
+.trip-card {
+  background: #ffffff !important;
+  border: 2px solid #d9d9d9 !important;
+}
+
+.badge.time {
+  background: #111111 !important;
+  color: #ffffff !important;
+  border-color: #111111 !important;
+  box-shadow: none !important;
+}
+
+.store-seq {
+  background: #f3f3f3 !important;
+  color: #000000 !important;
+  border: 1px solid #cfcfcf !important;
+}
+
+.lsp-tag,
+.truck-tag {
+  background: #f7f7f7 !important;
+  color: #000000 !important;
+  border-color: #cfcfcf !important;
+}
+
+.store-name {
+  font-size: clamp(28px, 1.6vw, 38px) !important;
+  color: #000000 !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: initial !important;
+  line-height: 1.15 !important;
+}
+
+.store-list {
+  overflow: auto !important;
+  padding-right: 4px;
+}
+
+.store-row.more-stores {
+  display: none !important;
+}
+
+.footer,
+.page-banner-sub,
+.summary-note,
+.meta-label,
+.summary-label,
+.page-stat-label {
+  color: #444444 !important;
+}
+</style>
