@@ -399,37 +399,6 @@ document.addEventListener('DOMContentLoaded', () => {
 </style>
 
 
-<style>
-/* ===== HEADER DARK STYLE (like old version) ===== */
-.topbar,
-.summary-row,
-.page-info{
-  background:#0b1f3a !important;
-  color:#ffffff !important;
-}
-
-.meta-card,
-.summary-card,
-.page-banner,
-.page-stat{
-  background:#0f2a4d !important;
-  color:#ffffff !important;
-  border:1px solid rgba(255,255,255,0.15) !important;
-}
-
-.summary-label,
-.meta-label,
-.page-stat-label{
-  color:#bcd3ff !important;
-}
-
-.summary-value,
-.meta-value,
-.page-stat-value{
-  color:#ffffff !important;
-}
-</style>
-
 </head>
 <body>
   <div class="page">
@@ -1266,3 +1235,79 @@ html, body {
   color: #444444 !important;
 }
 </style>
+
+
+<style>
+/* ===== restore old dark header/summary/page-info format ===== */
+html, body {
+  background: radial-gradient(circle at top right, #14335d 0%, #07111f 38%, #030814 100%) !important;
+}
+
+.topbar,
+.summary-row,
+.page-info {
+  background: transparent !important;
+}
+
+.topbar {
+  border: 1px solid rgba(255,255,255,.08) !important;
+  border-radius: 1.2vw !important;
+  background: linear-gradient(90deg, rgba(2,10,24,.96) 0%, rgba(7,20,40,.96) 38%, rgba(21,50,92,.94) 100%) !important;
+  box-shadow: 0 10px 30px rgba(0,0,0,.35) !important;
+}
+
+.logo-box {
+  background: rgba(255,255,255,.08) !important;
+  border: 1px solid rgba(255,255,255,.10) !important;
+  color: #ffffff !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+}
+
+.title {
+  color: #ffffff !important;
+}
+
+.meta-card,
+.summary-card,
+.page-banner,
+.page-stat {
+  background: linear-gradient(90deg, rgba(2,10,24,.96) 0%, rgba(8,23,45,.96) 40%, rgba(26,56,102,.92) 100%) !important;
+  border: 1px solid rgba(255,255,255,.10) !important;
+  border-radius: 1vw !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 30px rgba(0,0,0,.25) !important;
+}
+
+.meta-label,
+.summary-label,
+.page-stat-label,
+.page-banner-sub,
+.summary-note {
+  color: #b7cbee !important;
+}
+
+.meta-value,
+.summary-value,
+.page-banner-title,
+.page-stat-value,
+#syncStatus,
+#lspList {
+  color: #ffffff !important;
+}
+
+.board {
+  border: 1px solid rgba(255,255,255,.08) !important;
+}
+
+#footerSource,
+.status-inline,
+.playback-indicator {
+  color: #d7e7f7 !important;
+}
+
+.footer,
+.playback-indicator {
+  background: transparent !important;
+}
+</style>
+
