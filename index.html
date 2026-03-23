@@ -796,18 +796,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const list = document.createElement('div');
       list.className = 'store-list';
-      const maxVisibleStores = 6;
-      const renderStores = trip.stores.length > maxVisibleStores
-        ? trip.stores.slice(0, maxVisibleStores - 1)
-        : trip.stores.slice(0, maxVisibleStores);
+      const renderStores = trip.stores;
 
       renderStores.forEach(function(store, index){
         list.appendChild(createStoreRow(store, index));
       });
-
-      if (trip.stores.length > maxVisibleStores) {
-        list.appendChild(createMoreStoresRow(trip.stores.length - (maxVisibleStores - 1)));
-      }
 
       card.appendChild(top);
       card.appendChild(head);
@@ -1139,4 +1132,105 @@ document.addEventListener('DOMContentLoaded', () => {
 }
 
 /* footer indicator vẫn gọn */
+</style>
+
+
+<style>
+/* ===== TV WHITE MODE ===== */
+html, body {
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+.page {
+  background: #ffffff !important;
+}
+
+.topbar,
+.summary-card,
+.page-banner,
+.page-stat,
+.board,
+.playback-indicator,
+.meta-card {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border-color: #d9d9d9 !important;
+  box-shadow: none !important;
+}
+
+.title,
+.meta-value,
+.summary-value,
+.page-banner-title,
+.page-stat-value,
+#footerSource,
+.status-inline,
+.trip-card,
+.store-name,
+.truck,
+.lsp-tag,
+.truck-tag,
+.badge,
+.page-banner-sub,
+.meta-label,
+.summary-label,
+.page-stat-label,
+.summary-note,
+#playbackText,
+#playbackIcon {
+  color: #000000 !important;
+}
+
+.trip-card {
+  background: #ffffff !important;
+  border: 2px solid #d9d9d9 !important;
+}
+
+.badge.time {
+  background: #111111 !important;
+  color: #ffffff !important;
+  border-color: #111111 !important;
+  box-shadow: none !important;
+}
+
+.store-seq {
+  background: #f3f3f3 !important;
+  color: #000000 !important;
+  border: 1px solid #cfcfcf !important;
+}
+
+.lsp-tag,
+.truck-tag {
+  background: #f7f7f7 !important;
+  color: #000000 !important;
+  border-color: #cfcfcf !important;
+}
+
+.store-name {
+  font-size: clamp(28px, 1.6vw, 38px) !important;
+  color: #000000 !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: initial !important;
+  line-height: 1.15 !important;
+}
+
+.store-list {
+  overflow: auto !important;
+  padding-right: 4px;
+}
+
+.store-row.more-stores {
+  display: none !important;
+}
+
+.footer,
+.page-banner-sub,
+.summary-note,
+.meta-label,
+.summary-label,
+.page-stat-label {
+  color: #444444 !important;
+}
 </style>
