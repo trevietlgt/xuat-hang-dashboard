@@ -117,7 +117,7 @@
 
     .trip-grid{
       display:grid;
-      grid-template-columns:repeat(6, 1fr);
+      grid-template-columns:repeat(5, 1fr);
       grid-template-rows:1fr;
       gap:clamp(10px, .5vw, 16px);
       align-items:stretch;
@@ -344,7 +344,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const cards = document.querySelectorAll('.trip-card');
   cards.forEach(card => {
     const storeRows = card.querySelectorAll('.store-row:not(.more-stores)');
-    const count = Math.min(storeRows.length, 8);
+    const count = Math.min(storeRows.length, 5);
     card.setAttribute('data-store-count', String(count || 1));
   });
 });
@@ -531,7 +531,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <section class="footer">
       <div id="footerSource">Nguồn dữ liệu: Google Sheet trực tiếp · tự làm mới mỗi 60 giây</div>
       <div class="status-inline">
-        <span>Hiển thị 6 trip / trang · tối đa 8 điểm giao / trip</span>
+        <span>Hiển thị 5 trip / trang · tối đa 5 điểm giao / trip</span>
         <span>•</span>
         <span>Manual flip</span>
       </div>
@@ -545,7 +545,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/export?format=csv&gid=' + SHEET_GID;
     const REFRESH_MS = 60000;
     const PAGE_FLIP_MS = 15000;
-    const TRIPS_PER_PAGE = 6;
+    const TRIPS_PER_PAGE = 5;
     const ANIMATION_MS = 700;
     const TZ = 'Asia/Bangkok';
 
@@ -872,14 +872,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const list = document.createElement('div');
       list.className = 'store-list';
-      const renderStores = trip.stores.slice(0, 8);
+      const renderStores = trip.stores.slice(0, 5);
 
       renderStores.forEach(function(store, index){
         list.appendChild(createStoreRow(store, index));
       });
 
-      if (trip.stores.length > 8) {
-        list.appendChild(createMoreStoresRow(trip.stores.length - 8));
+      if (trip.stores.length > 5) {
+        list.appendChild(createMoreStoresRow(trip.stores.length - 5));
       }
 
       card.appendChild(top);
@@ -1166,7 +1166,7 @@ document.addEventListener('DOMContentLoaded', () => {
 /* 6 cột mỗi màn hình */
 .trip-grid{
   display:grid !important;
-  grid-template-columns: repeat(6, 1fr) !important;
+  grid-template-columns: repeat(5, 1fr) !important;
   grid-template-rows: 1fr !important;
   gap: clamp(10px, .5vw, 16px) !important;
   align-items: stretch !important;
@@ -1365,7 +1365,7 @@ html, body {
 
 <style>
 .trip-grid{
-  grid-template-columns:repeat(6, 1fr) !important;
+  grid-template-columns:repeat(5, 1fr) !important;
 }
 .store-row{
   grid-template-columns:72px 1fr !important;
@@ -1457,6 +1457,174 @@ html, body {
 
 .trip-card{
   padding:10px 8px !important;
+}
+</style>
+
+
+
+<style>
+/* ===== v4: 5 cột / 5 điểm dừng / manual ===== */
+.trip-grid{
+  grid-template-columns:repeat(5, 1fr) !important;
+  gap:10px !important;
+}
+
+.trip-card{
+  padding:10px 8px 8px !important;
+  border-radius:18px !important;
+}
+
+.trip-top{
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:stretch !important;
+  gap:8px !important;
+  margin-bottom:6px !important;
+}
+
+.trip-time-line,
+.trip-meta-line{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:flex-start !important;
+  gap:8px !important;
+  width:100% !important;
+  flex-wrap:wrap !important;
+}
+
+.badge.time{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  font-size:clamp(20px, 1.2vw, 28px) !important;
+  font-weight:900 !important;
+  line-height:1 !important;
+  padding:9px 16px !important;
+  border-radius:14px !important;
+  background:linear-gradient(180deg, #0f172a 0%, #1e293b 100%) !important;
+  color:#ffffff !important;
+  border:1px solid rgba(255,255,255,.14) !important;
+  box-shadow:none !important;
+}
+
+.lsp-tag,
+.truck-tag{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  font-size:clamp(17px, 1vw, 24px) !important;
+  font-weight:900 !important;
+  line-height:1 !important;
+  padding:9px 14px !important;
+  border-radius:14px !important;
+}
+
+.lsp-tag{
+  background:linear-gradient(180deg, #dbeafe 0%, #bfdbfe 100%) !important;
+  color:#0f172a !important;
+  border:1px solid #93c5fd !important;
+}
+
+.truck-tag{
+  background:linear-gradient(180deg, #dcfce7 0%, #bbf7d0 100%) !important;
+  color:#14532d !important;
+  border:1px solid #86efac !important;
+}
+
+.store-list{
+  display:flex !important;
+  flex-direction:column !important;
+  gap:0 !important;
+  overflow:hidden !important;
+  padding-right:0 !important;
+}
+
+.store-row{
+  display:grid !important;
+  grid-template-columns:42px 1fr !important;
+  align-items:flex-start !important;
+  gap:8px !important;
+  padding:7px 2px !important;
+  border-bottom:1px solid rgba(0,0,0,.08) !important;
+}
+.store-row:last-child{
+  border-bottom:none !important;
+}
+
+.store-seq{
+  width:34px !important;
+  min-width:34px !important;
+  height:34px !important;
+  min-height:34px !important;
+  padding:0 !important;
+  border-radius:999px !important;
+  font-size:clamp(16px, .9vw, 21px) !important;
+  font-weight:900 !important;
+  color:#ffffff !important;
+  background:linear-gradient(180deg, #38bdf8 0%, #0284c7 100%) !important;
+  border:1px solid #0369a1 !important;
+  box-shadow:none !important;
+}
+
+.store-main{
+  min-width:0 !important;
+  padding-top:1px !important;
+}
+
+.store-name{
+  font-size:clamp(17px, .95vw, 23px) !important;
+  font-weight:900 !important;
+  line-height:1.08 !important;
+  color:#000000 !important;
+  white-space:normal !important;
+  overflow:hidden !important;
+  text-overflow:clip !important;
+  display:-webkit-box !important;
+  -webkit-box-orient:vertical !important;
+  -webkit-line-clamp:3 !important;
+  max-height:3.3em !important;
+  word-break:break-word !important;
+}
+
+.page-nav-controls{
+  display:flex !important;
+  align-items:center !important;
+  gap:10px !important;
+}
+
+.nav-btn{
+  min-width:92px !important;
+  padding:10px 16px !important;
+  font-size:clamp(16px, .92vw, 22px) !important;
+  font-weight:900 !important;
+  border-radius:12px !important;
+  border:1px solid rgba(255,255,255,.16) !important;
+  background:linear-gradient(180deg, #1d4ed8 0%, #1e40af 100%) !important;
+  color:#ffffff !important;
+  cursor:pointer !important;
+}
+
+.nav-btn:disabled{
+  opacity:.45 !important;
+  cursor:not-allowed !important;
+}
+
+@media (max-width: 1400px){
+  .trip-grid{
+    gap:8px !important;
+  }
+  .badge.time{
+    font-size:18px !important;
+    padding:8px 12px !important;
+  }
+  .lsp-tag,
+  .truck-tag{
+    font-size:15px !important;
+    padding:8px 10px !important;
+  }
+  .store-name{
+    font-size:16px !important;
+  }
 }
 </style>
 
