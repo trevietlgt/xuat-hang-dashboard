@@ -687,6 +687,15 @@ document.addEventListener('DOMContentLoaded', () => {
         .replaceAll("'", '&#39;');
     }
 
+
+    function splitStoreName(fullName) {
+      const raw = String(fullName || '').trim();
+      if (!raw) return { code: '-', name: '-' };
+      const code = raw.slice(0, 6) || '-';
+      const name = raw.slice(6).trim() || raw;
+      return { code: code, name: name };
+    }
+
     function pickHeaderAndRows(rows) {
       let headerIndex = rows.findIndex(function(r){
         const c0 = String(r[0] || '').trim().toUpperCase();
@@ -830,10 +839,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function createStoreRow(store, index) {
       const row = document.createElement('div');
       row.className = 'store-row';
+      const parts = splitStoreName(store.storeName || '-');
       row.innerHTML =
-        '<div class="store-seq">' + escapeHtml(index + 1) + '</div>' +
+        '<div class="store-seq"><span class="seq-circle">' + escapeHtml(String(index + 1)) + '</span></div>' +
         '<div class="store-main">' +
-          '<div class="store-name">' + formatStoreNameForDisplay(store.storeName || '-') + '</div>' +
+          '<div class="store-code">' + escapeHtml(parts.code) + '</div>' +
+          '<div class="store-name">' + escapeHtml(parts.name) + '</div>' +
         '</div>';
       return row;
     }
@@ -842,8 +853,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const row = document.createElement('div');
       row.className = 'store-row empty-row';
       row.innerHTML =
-        '<div class="store-seq"><span class="seq-circle">' + escapeHtml(index + 1) + '</span></div>' +
+        '<div class="store-seq"></div>' +
         '<div class="store-main">' +
+          '<div class="store-code">&nbsp;</div>' +
           '<div class="store-name">&nbsp;</div>' +
         '</div>';
       return row;
@@ -878,22 +890,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const head = document.createElement('div');
       head.className = 'trip-headline';
-      head.innerHTML =
-        '';
+      head.innerHTML = '';
 
       const list = document.createElement('div');
       list.className = 'store-list';
-      const renderStores = trip.stores.slice(0, 5);
+
+      const maxStops = typeof MAX_STOPS_PER_TRIP !== 'undefined' ? MAX_STOPS_PER_TRIP : 5;
+      const renderStores = trip.stores.slice(0, maxStops);
+      const targetRows = Math.max(pageMaxStops || renderStores.length || 1, 1);
 
       renderStores.forEach(function(store, index){
         list.appendChild(createStoreRow(store, index));
       });
+
       for (let i = renderStores.length; i < targetRows; i++) {
         list.appendChild(createEmptyStoreRow(i));
       }
 
-      if (trip.stores.length > 5) {
-        list.appendChild(createMoreStoresRow(trip.stores.length - 5));
+      if (trip.stores.length > maxStops) {
+        list.appendChild(createMoreStoresRow(trip.stores.length - maxStops));
       }
 
       card.appendChild(top);
@@ -918,8 +933,12 @@ document.addEventListener('DOMContentLoaded', () => {
       const prevPage = pageState.pages[pageState.currentIndex] || null;
       pageState.currentIndex = ((index % totalPages) + totalPages) % totalPages;
       const page = pageState.pages[pageState.currentIndex];
-      const stopCount = page.trips.reduce(function(sum, trip){
-        return sum + trip.stores.length;
+      const maxStops = typeof MAX_STOPS_PER_TRIP !== 'undefined' ? MAX_STOPS_PER_TRIP : 5;
+      const pageMaxStops = page.trips.reduce(function(max, trip){
+        return Math.max(max, Math.min(trip.stores.length, maxStops));
+      }, 0) || 1;
+      const stopCount = page.trips.reduce(function(sum){
+        return sum + pageMaxStops;
       }, 0);
 
       els.pageTitle.textContent = page.periodLabel;
@@ -933,18 +952,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const motion = prevPage && prevPage.periodKey !== page.periodKey ? 'up' : 'left';
       nextGrid.className = 'trip-grid grid-panel enter-' + motion;
       nextGrid.id = 'tripGrid';
+      const pageTripCount = Math.max(page.trips.length, 1);
+      nextGrid.style.gridTemplateColumns = 'repeat(' + Math.min(pageTripCount, TRIPS_PER_PAGE) + ', 1fr)';
       page.trips.forEach(function(trip){
         nextGrid.appendChild(createTripCard(trip, page.periodKey, pageMaxStops));
       });
 
-      const emptySlots = TRIPS_PER_PAGE - page.trips.length;
-      for (let i = 0; i < emptySlots; i++) {
-        const filler = document.createElement('div');
-        filler.className = 'trip-card';
-        filler.style.opacity = '.12';
-        filler.innerHTML = '<div class="empty">Trống</div>';
-        nextGrid.appendChild(filler);
-      }
+      
 
       const currentGrid = els.tripGrid;
       if (currentGrid && currentGrid.parentNode) {
@@ -1736,5 +1750,114 @@ html, body {
     height:32px !important;
     font-size:21px !important;
   }
+}
+</style>
+
+<style>
+.store-name{
+  font-size:120% !important;
+  line-height:1.38 !important;
+}
+</style>
+
+
+<style>
+.store-row{
+  grid-template-columns: 48px 1fr !important;
+  gap: 10px !important;
+  padding: 8px 6px !important;
+}
+
+.store-seq{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+
+.seq-circle{
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 999px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: #17a8ff !important;
+  color: #ffffff !important;
+  font-size: 20px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+}
+
+.store-main{
+  min-width: 0 !important;
+  display: grid !important;
+  grid-template-rows: auto auto !important;
+  align-content: center !important;
+  row-gap: 6px !important;
+}
+
+.store-code{
+  font-size: 95% !important;
+  font-weight: 900 !important;
+  line-height: 1.15 !important;
+  color: #111111 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.store-name{
+  font-size: 110% !important;
+  font-weight: 800 !important;
+  line-height: 1.25 !important;
+  color: #111111 !important;
+  display: block !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  -webkit-line-clamp: unset !important;
+}
+
+.store-row.empty-row .store-code,
+.store-row.empty-row .store-name{
+  visibility: hidden !important;
+}
+</style>
+
+
+<style>
+.store-main{
+  row-gap: 4px !important;
+}
+
+.store-code,
+.store-name{
+  font-size: 108% !important;
+  font-weight: 800 !important;
+  line-height: 1.2 !important;
+  color: #111111 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.store-code{
+  letter-spacing: 0 !important;
+}
+
+.store-name{
+  display: block !important;
+}
+
+.store-row.empty-row{
+  border-bottom: none !important;
+}
+
+.store-row.empty-row .store-main{
+  visibility: hidden !important;
+}
+
+.store-row.empty-row .store-seq{
+  visibility: hidden !important;
 }
 </style>
