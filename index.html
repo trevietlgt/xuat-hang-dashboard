@@ -88,7 +88,7 @@
     .summary-note.hidden{visibility:hidden}
 
     .page-info{
-      display:grid; grid-template-columns: 1fr auto auto auto;
+      display:grid; grid-template-columns: 1fr auto auto auto auto;
       gap:.28vw;
       align-items:center;
     }
@@ -117,7 +117,7 @@
 
     .trip-grid{
       display:grid;
-      grid-template-columns:repeat(4, 1fr);
+      grid-template-columns:repeat(6, 1fr);
       grid-template-rows:1fr;
       gap:clamp(10px, .5vw, 16px);
       align-items:stretch;
@@ -399,6 +399,33 @@ document.addEventListener('DOMContentLoaded', () => {
 </style>
 
 
+
+<style>
+.page-nav-controls{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:.5vw;
+}
+.nav-btn{
+  border:1px solid rgba(255,255,255,.12);
+  background:linear-gradient(90deg, rgba(2,10,24,.96) 0%, rgba(8,23,45,.96) 40%, rgba(26,56,102,.92) 100%);
+  color:#ffffff;
+  border-radius:.75vw;
+  padding:.5vw .9vw;
+  font-size:.82vw;
+  font-weight:900;
+  cursor:pointer;
+  min-width:4.8vw;
+}
+.nav-btn:hover{filter:brightness(1.08)}
+.nav-btn:active{transform:translateY(1px)}
+.nav-btn:disabled{opacity:.45; cursor:not-allowed}
+@media (max-width:1200px){
+  .nav-btn{font-size:14px; padding:8px 14px; border-radius:10px; min-width:72px}
+}
+</style>
+
 </head>
 <body>
   <div class="page">
@@ -480,7 +507,11 @@ document.addEventListener('DOMContentLoaded', () => {
       </div>
       <div class="page-stat">
         <div class="page-stat-label">Lật trang</div>
-        <div id="pageFlipEvery" class="page-stat-value">15s</div>
+        <div id="pageFlipEvery" class="page-stat-value">Manual</div>
+      </div>
+      <div class="page-nav-controls">
+        <button id="prevPageBtn" class="nav-btn" type="button">Prev</button>
+        <button id="nextPageBtn" class="nav-btn" type="button">Next</button>
       </div>
     </section>
 
@@ -493,12 +524,10 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="status-inline">
         <span>Hiển thị 6 trip / trang · tối đa 6 cửa hàng / trip</span>
         <span>•</span>
-        <span>Auto flip</span>
+        <span>Manual flip</span>
       </div>
     </section>
   </div>
-
-  <div id="playbackIndicator" class="playback-indicator"><span id="playbackIcon" class="icon">▶</span><span id="playbackText">Auto flip đang chạy · chạm để dừng</span></div>
 
   <script src="https://www.gstatic.com/charts/loader.js"></script>
   <script>
@@ -507,7 +536,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/export?format=csv&gid=' + SHEET_GID;
     const REFRESH_MS = 60000;
     const PAGE_FLIP_MS = 15000;
-    const TRIPS_PER_PAGE = 4;
+    const TRIPS_PER_PAGE = 6;
     const ANIMATION_MS = 700;
     const TZ = 'Asia/Bangkok';
 
@@ -542,15 +571,10 @@ document.addEventListener('DOMContentLoaded', () => {
       pageFlipEvery: document.getElementById('pageFlipEvery'),
       boardStage: document.getElementById('boardStage'),
       tripGrid: document.getElementById('tripGrid'),
-      footerSource: document.getElementById('footerSource'),
-      playbackIndicator: document.getElementById('playbackIndicator'),
-      playbackIcon: document.getElementById('playbackIcon'),
-      playbackText: document.getElementById('playbackText')
+      footerSource: document.getElementById('footerSource')
     };
 
     let refreshTimer = null;
-    let flipTimer = null;
-    let isFlipPaused = false;
     let pageState = { pages: [], currentIndex: 0 };
 
 
@@ -752,13 +776,19 @@ document.addEventListener('DOMContentLoaded', () => {
       };
     }
 
+    function formatStoreNameForDisplay(name) {
+      const raw = String(name || '-');
+      if (raw.length <= 6) return escapeHtml(raw);
+      return escapeHtml(raw.slice(0, 6)) + '<br>' + escapeHtml(raw.slice(6).trimStart());
+    }
+
     function createStoreRow(store, index) {
       const row = document.createElement('div');
       row.className = 'store-row';
       row.innerHTML =
-        '<div class="store-seq">STOP ' + escapeHtml(index + 1) + '</div>' +
+        '<div class="store-seq">' + escapeHtml(index + 1) + '</div>' +
         '<div class="store-main">' +
-          '<div class="store-name">' + escapeHtml(store.storeName || '-') + '</div>' +
+          '<div class="store-name">' + formatStoreNameForDisplay(store.storeName || '-') + '</div>' +
         '</div>';
       return row;
     }
@@ -784,7 +814,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const top = document.createElement('div');
       top.className = 'trip-top';
       top.innerHTML =
-        '<span class="badge time">Giờ xuất ' + escapeHtml(trip.pickupTime) + '</span>' +
+        '<span class="badge time">' + escapeHtml(trip.pickupTime) + '</span>' +
         '<div class="truck">' +
           '<span class="lsp-tag ' + getLspClass(trip.lsp || '-') + '">LSP ' + escapeHtml(trip.lsp || '-') + '</span>' +
           '<span class="truck-tag"><span class="truck-icon">🚚</span>' + escapeHtml(formatTruckType(trip.truckType || '-')) + '</span>' +
@@ -818,6 +848,7 @@ document.addEventListener('DOMContentLoaded', () => {
         els.pageSubTitle.textContent = 'Trang 0 / 0';
         els.pageTripCount.textContent = '0';
         els.pageStopCount.textContent = '0';
+        updateNavButtons();
         return;
       }
 
@@ -832,7 +863,8 @@ document.addEventListener('DOMContentLoaded', () => {
       els.pageSubTitle.textContent = 'Màn hình ' + (page.periodKey === 'morning' ? 'ca sáng' : 'ca chiều') + ' · Trang ' + (pageState.currentIndex + 1) + ' / ' + totalPages;
       els.pageTripCount.textContent = String(page.trips.length);
       els.pageStopCount.textContent = String(stopCount);
-      els.pageFlipEvery.textContent = String(PAGE_FLIP_MS / 1000) + 's';
+      els.pageFlipEvery.textContent = 'Manual';
+      updateNavButtons();
 
       const nextGrid = document.createElement('div');
       const motion = prevPage && prevPage.periodKey !== page.periodKey ? 'up' : 'left';
@@ -865,53 +897,17 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    function updatePlaybackIndicator() {
-      const canFlip = pageState.pages.length > 1;
-      const paused = isFlipPaused || !canFlip;
-      els.playbackIndicator.classList.toggle('paused', paused);
-      els.playbackIcon.textContent = paused ? '⏸' : '▶';
-
-      if (!canFlip) {
-        els.playbackText.textContent = 'Chỉ có 1 trang · không cần auto flip';
-        return;
-      }
-
-      els.playbackText.textContent = paused
-        ? 'Đang dừng tại màn hình hiện tại · chạm để chạy tiếp'
-        : 'Auto flip đang chạy · chạm để dừng';
-    }
-
-    function stopPageFlip() {
-      if (flipTimer) {
-        clearInterval(flipTimer);
-        flipTimer = null;
-      }
-      updatePlaybackIndicator();
-    }
-
-    function startPageFlip() {
-      if (flipTimer) clearInterval(flipTimer);
-      if (isFlipPaused || pageState.pages.length <= 1) {
-        flipTimer = null;
-        updatePlaybackIndicator();
-        return;
-      }
-      flipTimer = setInterval(function(){
-        renderPage(pageState.currentIndex + 1);
-      }, PAGE_FLIP_MS);
-      updatePlaybackIndicator();
-    }
-
-    function togglePageFlip() {
-      isFlipPaused = !isFlipPaused;
-      if (isFlipPaused) {
-        stopPageFlip();
-      } else {
-        startPageFlip();
-      }
+    function updateNavButtons() {
+      const hasPages = pageState.pages.length > 0;
+      if (els.pageFlipEvery) els.pageFlipEvery.textContent = 'Manual';
+      const prevBtn = document.getElementById('prevPageBtn');
+      const nextBtn = document.getElementById('nextPageBtn');
+      if (prevBtn) prevBtn.disabled = !hasPages;
+      if (nextBtn) nextBtn.disabled = !hasPages;
     }
 
     function renderDashboard(items, sourceLabel) {
+
       const label = sourceLabel || 'Google Sheets Published CSV';
       const trips = groupTrips(items);
       const built = buildPages(trips);
@@ -935,8 +931,7 @@ document.addEventListener('DOMContentLoaded', () => {
       els.footerSource.textContent = 'Nguồn dữ liệu: ' + label + ' · tự làm mới mỗi 60 giây';
 
       renderPage(0);
-      startPageFlip();
-      updatePlaybackIndicator();
+      updateNavButtons();
     }
 
     async function fetchCsvText(url) {
@@ -1034,8 +1029,14 @@ document.addEventListener('DOMContentLoaded', () => {
       refreshTimer = setInterval(loadRemoteData, REFRESH_MS);
     }
 
-    document.addEventListener('click', function(){
-      togglePageFlip();
+    document.getElementById('prevPageBtn').addEventListener('click', function(event){
+      event.stopPropagation();
+      renderPage(pageState.currentIndex - 1);
+    });
+
+    document.getElementById('nextPageBtn').addEventListener('click', function(event){
+      event.stopPropagation();
+      renderPage(pageState.currentIndex + 1);
     });
 
     function runTests() {
@@ -1113,10 +1114,10 @@ document.addEventListener('DOMContentLoaded', () => {
 <style>
 
 
-/* 4 cột mỗi màn hình */
+/* 6 cột mỗi màn hình */
 .trip-grid{
   display:grid !important;
-  grid-template-columns: repeat(4, 1fr) !important;
+  grid-template-columns: repeat(6, 1fr) !important;
   grid-template-rows: 1fr !important;
   gap: clamp(10px, .5vw, 16px) !important;
   align-items: stretch !important;
@@ -1311,3 +1312,25 @@ html, body {
 }
 </style>
 
+
+
+<style>
+.trip-grid{
+  grid-template-columns:repeat(6, 1fr) !important;
+}
+.store-row{
+  grid-template-columns:72px 1fr !important;
+  gap:8px !important;
+  padding:6px 8px !important;
+}
+.store-seq{
+  min-width:64px !important;
+  padding:6px 8px !important;
+}
+.store-name{
+  white-space:normal !important;
+  overflow:visible !important;
+  text-overflow:initial !important;
+  word-break:break-word;
+}
+</style>
