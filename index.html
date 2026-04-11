@@ -777,9 +777,45 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function formatStoreNameForDisplay(name) {
-      const raw = String(name || '-');
-      if (raw.length <= 6) return escapeHtml(raw);
-      return escapeHtml(raw.slice(0, 6)) + '<br>' + escapeHtml(raw.slice(6).trimStart());
+      const raw = String(name || '-').replace(/\s+/g, ' ').trim();
+      if (!raw) return '-';
+
+      const words = raw.split(' ');
+      if (words.length <= 1) {
+        const chunkSize = Math.ceil(raw.length / Math.min(3, Math.max(1, Math.ceil(raw.length / 10))));
+        const chunks = [];
+        for (let i = 0; i < raw.length && chunks.length < 3; i += chunkSize) {
+          chunks.push(raw.slice(i, i + chunkSize));
+        }
+        return chunks.map(escapeHtml).join('<br>');
+      }
+
+      const lineCount = Math.min(3, words.length);
+      const totalLength = raw.length;
+      const targetLength = Math.ceil(totalLength / lineCount);
+      const lines = [];
+      let current = '';
+
+      words.forEach(function(word, index) {
+        const candidate = current ? current + ' ' + word : word;
+        const remainingWords = words.length - index - 1;
+        const remainingLines = lineCount - lines.length - 1;
+        if (current && candidate.length > targetLength && remainingWords >= remainingLines) {
+          lines.push(current);
+          current = word;
+        } else {
+          current = candidate;
+        }
+      });
+
+      if (current) lines.push(current);
+
+      while (lines.length > 3) {
+        const tail = lines.pop();
+        lines[lines.length - 1] += ' ' + tail;
+      }
+
+      return lines.slice(0, 3).map(escapeHtml).join('<br>');
     }
 
     function createStoreRow(store, index) {
@@ -814,9 +850,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const top = document.createElement('div');
       top.className = 'trip-top';
       top.innerHTML =
-        '<span class="badge time">' + escapeHtml(trip.pickupTime) + '</span>' +
-        '<div class="truck">' +
-          '<span class="lsp-tag ' + getLspClass(trip.lsp || '-') + '">LSP ' + escapeHtml(trip.lsp || '-') + '</span>' +
+        '<div class="trip-time-line"><span class="badge time">' + escapeHtml(trip.pickupTime) + '</span></div>' +
+        '<div class="trip-meta-line">' +
+          '<span class="lsp-tag ' + getLspClass(trip.lsp || '-') + '">' + escapeHtml(trip.lsp || '-') + '</span>' +
           '<span class="truck-tag"><span class="truck-icon">🚚</span>' + escapeHtml(formatTruckType(trip.truckType || '-')) + '</span>' +
         '</div>';
 
@@ -1334,3 +1370,80 @@ html, body {
   word-break:break-word;
 }
 </style>
+
+
+<style>
+/* ===== compact card layout v2 ===== */
+.trip-top{
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:flex-start !important;
+  gap:8px !important;
+}
+
+.trip-time-line,
+.trip-meta-line{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+  width:100%;
+}
+
+.badge.time{
+  font-size:clamp(15px, .9vw, 22px) !important;
+  padding:6px 12px !important;
+  border-radius:999px !important;
+}
+
+.lsp-tag,
+.truck-tag{
+  font-size:clamp(12px, .72vw, 17px) !important;
+  padding:5px 10px !important;
+}
+
+.store-row{
+  grid-template-columns:56px 1fr !important;
+  gap:8px !important;
+  padding:4px 4px !important;
+  align-items:start !important;
+}
+
+.store-seq{
+  min-width:0 !important;
+  width:56px !important;
+  min-height:44px !important;
+  height:44px !important;
+  padding:2px 4px !important;
+  font-size:clamp(16px, .95vw, 22px) !important;
+  border-radius:10px !important;
+}
+
+.store-main{
+  padding-top:1px;
+}
+
+.store-name{
+  font-size:clamp(19px, 1.08vw, 27px) !important;
+  line-height:1.02 !important;
+  white-space:normal !important;
+  overflow:hidden !important;
+  text-overflow:clip !important;
+  display:-webkit-box !important;
+  -webkit-box-orient:vertical !important;
+  -webkit-line-clamp:3 !important;
+  max-height:3.1em !important;
+  word-break:break-word;
+}
+
+.store-list{
+  gap:4px !important;
+  overflow:hidden !important;
+  padding-right:0 !important;
+}
+
+.trip-card{
+  padding:10px 8px !important;
+}
+</style>
+
