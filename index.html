@@ -531,7 +531,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <section class="footer">
       <div id="footerSource">Nguồn dữ liệu: Google Sheet trực tiếp · tự làm mới mỗi 60 giây</div>
       <div class="status-inline">
-        <span>Hiển thị 5 trip / trang · tối đa 5 điểm giao / trip</span>
+        <span>Hiển thị tối đa 5 trip / trang · tối đa 5 điểm giao / trip</span>
         <span>•</span>
         <span>Manual flip</span>
       </div>
@@ -895,7 +895,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const list = document.createElement('div');
       list.className = 'store-list';
 
-      const maxStops = typeof MAX_STOPS_PER_TRIP !== 'undefined' ? MAX_STOPS_PER_TRIP : 5;
+      const maxStops = typeof MAX_STOPS_PER_TRIP !== 'undefined' ? MAX_STOPS_PER_TRIP : 50;
       const renderStores = trip.stores.slice(0, maxStops);
       const targetRows = Math.max(pageMaxStops || renderStores.length || 1, 1);
 
@@ -933,7 +933,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const prevPage = pageState.pages[pageState.currentIndex] || null;
       pageState.currentIndex = ((index % totalPages) + totalPages) % totalPages;
       const page = pageState.pages[pageState.currentIndex];
-      const maxStops = typeof MAX_STOPS_PER_TRIP !== 'undefined' ? MAX_STOPS_PER_TRIP : 5;
+      const maxStops = typeof MAX_STOPS_PER_TRIP !== 'undefined' ? MAX_STOPS_PER_TRIP : 50;
       const pageMaxStops = page.trips.reduce(function(max, trip){
         return Math.max(max, Math.min(trip.stores.length, maxStops));
       }, 0) || 1;
