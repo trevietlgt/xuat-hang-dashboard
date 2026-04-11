@@ -168,36 +168,52 @@
       min-height:0;
       display:grid;
       grid-template-columns:1fr;
-      gap:8px;
+      gap:0;
+      border:1px solid #d9d9d9;
+      border-radius:16px;
+      overflow:hidden;
+      background:#ffffff;
     }
 
     .store-row {
-  display:grid;
-  grid-template-columns:112px 1fr;
-  align-items:center;
-  gap:12px;
-  padding:8px 12px;
-}
+      display:grid;
+      grid-template-columns:56px 1fr;
+      align-items:center;
+      gap:10px;
+      padding:8px 10px;
+      min-height:66px;
+      border-bottom:1px solid #d9d9d9;
+      background:#ffffff;
+    }
+    .store-row:last-child{border-bottom:none}
     .store-seq {
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size: clamp(20px, 1.18vw, 28px);
-  font-weight:900;
-  color:#9de7ff;
-  text-transform:uppercase;
-  background:rgba(41,182,246,.15);
-  border:1px solid rgba(41,182,246,.35);
-  border-radius:12px;
-  padding:8px 12px;
-  min-width:104px;
-  height:100%;
-  white-space:nowrap;
-}
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      width:40px;
+      height:40px;
+      min-width:40px;
+      font-size: clamp(18px, .95vw, 24px);
+      font-weight:900;
+      color:#ffffff;
+      background:#1fa3ff;
+      border:2px solid #0b7dd1;
+      border-radius:999px;
+      white-space:nowrap;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.25);
+    }
     .store-main{min-width:0}
     .store-name{
-      font-size:clamp(21px, 1.24vw, 29px); font-weight:900; line-height:1.1;
-      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+      font-size:clamp(15px, .92vw, 21px);
+      font-weight:800;
+      line-height:1.12;
+      white-space:normal;
+      overflow:hidden;
+      text-overflow:clip;
+      display:-webkit-box;
+      -webkit-box-orient:vertical;
+      -webkit-line-clamp:3;
+      word-break:break-word;
     }
     .store-row.more-stores{
       display:flex;
@@ -296,13 +312,6 @@
 
 
 
-.store-row:nth-child(odd) .store-seq{
-  background:rgba(41,182,246,.18);
-}
-.store-row:nth-child(even) .store-seq{
-  background:rgba(120,255,214,.18);
-}
-
 </style>
 
 <style>
@@ -335,7 +344,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const cards = document.querySelectorAll('.trip-card');
   cards.forEach(card => {
     const storeRows = card.querySelectorAll('.store-row:not(.more-stores)');
-    const count = Math.min(storeRows.length, 6);
+    const count = Math.min(storeRows.length, 8);
     card.setAttribute('data-store-count', String(count || 1));
   });
 });
@@ -522,7 +531,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <section class="footer">
       <div id="footerSource">Nguồn dữ liệu: Google Sheet trực tiếp · tự làm mới mỗi 60 giây</div>
       <div class="status-inline">
-        <span>Hiển thị 6 trip / trang · tối đa 6 cửa hàng / trip</span>
+        <span>Hiển thị 6 trip / trang · tối đa 8 điểm giao / trip</span>
         <span>•</span>
         <span>Manual flip</span>
       </div>
@@ -781,25 +790,26 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!raw) return '-';
 
       const words = raw.split(' ');
+      const prefersTwoLines = raw.length <= 18;
+      const maxLines = prefersTwoLines ? 2 : 3;
+
       if (words.length <= 1) {
-        const chunkSize = Math.ceil(raw.length / Math.min(3, Math.max(1, Math.ceil(raw.length / 10))));
+        const chunkSize = Math.ceil(raw.length / maxLines);
         const chunks = [];
-        for (let i = 0; i < raw.length && chunks.length < 3; i += chunkSize) {
+        for (let i = 0; i < raw.length && chunks.length < maxLines; i += chunkSize) {
           chunks.push(raw.slice(i, i + chunkSize));
         }
         return chunks.map(escapeHtml).join('<br>');
       }
 
-      const lineCount = Math.min(3, words.length);
-      const totalLength = raw.length;
-      const targetLength = Math.ceil(totalLength / lineCount);
       const lines = [];
+      const targetLength = Math.ceil(raw.length / maxLines);
       let current = '';
 
       words.forEach(function(word, index) {
         const candidate = current ? current + ' ' + word : word;
         const remainingWords = words.length - index - 1;
-        const remainingLines = lineCount - lines.length - 1;
+        const remainingLines = maxLines - lines.length - 1;
         if (current && candidate.length > targetLength && remainingWords >= remainingLines) {
           lines.push(current);
           current = word;
@@ -809,13 +819,12 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       if (current) lines.push(current);
-
-      while (lines.length > 3) {
+      while (lines.length > maxLines) {
         const tail = lines.pop();
         lines[lines.length - 1] += ' ' + tail;
       }
 
-      return lines.slice(0, 3).map(escapeHtml).join('<br>');
+      return lines.slice(0, maxLines).map(escapeHtml).join('<br>');
     }
 
     function createStoreRow(store, index) {
@@ -863,11 +872,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const list = document.createElement('div');
       list.className = 'store-list';
-      const renderStores = trip.stores;
+      const renderStores = trip.stores.slice(0, 8);
 
       renderStores.forEach(function(store, index){
         list.appendChild(createStoreRow(store, index));
       });
+
+      if (trip.stores.length > 8) {
+        list.appendChild(createMoreStoresRow(trip.stores.length - 8));
+      }
 
       card.appendChild(top);
       card.appendChild(head);
@@ -1233,9 +1246,9 @@ html, body {
 }
 
 .store-seq {
-  background: #f3f3f3 !important;
-  color: #000000 !important;
-  border: 1px solid #cfcfcf !important;
+  background: #1fa3ff !important;
+  color: #ffffff !important;
+  border: 2px solid #0b7dd1 !important;
 }
 
 .lsp-tag,
@@ -1246,12 +1259,12 @@ html, body {
 }
 
 .store-name {
-  font-size: clamp(28px, 1.6vw, 38px) !important;
+  font-size: clamp(15px, .92vw, 21px) !important;
   color: #000000 !important;
   white-space: normal !important;
-  overflow: visible !important;
-  text-overflow: initial !important;
-  line-height: 1.15 !important;
+  overflow: hidden !important;
+  text-overflow: clip !important;
+  line-height: 1.12 !important;
 }
 
 .store-list {
