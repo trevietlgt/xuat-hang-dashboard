@@ -88,7 +88,7 @@
     .summary-note.hidden{visibility:hidden}
 
     .page-info{
-      display:grid; grid-template-columns: 1fr auto auto auto auto;
+      display:grid; grid-template-columns: 1fr auto auto auto;
       gap:.28vw;
       align-items:center;
     }
@@ -480,14 +480,14 @@ document.addEventListener('DOMContentLoaded', () => {
       </div>
       <div class="summary-card">
         <div class="summary-head">
-          <div class="summary-label">Ca sáng</div>
+          <div class="summary-label">Tổng chuyến hiển thị</div>
           <div id="morningCount" class="summary-value">0</div>
         </div>
         <div class="summary-note hidden">&nbsp;</div>
       </div>
       <div class="summary-card">
         <div class="summary-head">
-          <div class="summary-label">Ca chiều</div>
+          <div class="summary-label">Đang không tách ca</div>
           <div id="afternoonCount" class="summary-value">0</div>
         </div>
         <div class="summary-note hidden">&nbsp;</div>
@@ -503,8 +503,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     <section class="page-info">
       <div class="page-banner">
-        <div id="pageTitle" class="page-banner-title">Ca sáng</div>
-        <div id="pageSubTitle" class="page-banner-sub">Trang 1 / 1</div>
+        <div id="pageTitle" class="page-banner-title">Danh sách chuyến giao</div>
+        <div id="pageSubTitle" class="page-banner-sub">Hiển thị toàn bộ chuyến · cuộn ngang để xem thêm</div>
       </div>
       <div class="page-stat">
         <div class="page-stat-label">Trip trên trang</div>
@@ -516,13 +516,9 @@ document.addEventListener('DOMContentLoaded', () => {
       </div>
       <div class="page-stat">
         <div class="page-stat-label">Lật trang</div>
-        <div id="pageFlipEvery" class="page-stat-value">Manual</div>
+        <div id="pageFlipEvery" class="page-stat-value">Thanh cuộn ngang</div>
       </div>
-      <div class="page-nav-controls">
-        <button id="prevPageBtn" class="nav-btn" type="button">Prev</button>
-        <button id="nextPageBtn" class="nav-btn" type="button">Next</button>
-      </div>
-    </section>
+</section>
 
     <section class="board">
       <div id="boardStage" class="board-stage"><div id="tripGrid" class="trip-grid grid-panel"></div></div>
@@ -531,9 +527,9 @@ document.addEventListener('DOMContentLoaded', () => {
     <section class="footer">
       <div id="footerSource">Nguồn dữ liệu: Google Sheet trực tiếp · tự làm mới mỗi 60 giây</div>
       <div class="status-inline">
-        <span>Hiển thị tối đa 5 trip / trang · tối đa 5 điểm giao / trip</span>
+        <span>Hiển thị 5 cột trên màn hình · cuộn ngang để xem thêm chuyến</span>
         <span>•</span>
-        <span>Manual flip</span>
+        <span>Horizontal scroll</span>
       </div>
     </section>
   </div>
@@ -547,6 +543,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const PAGE_FLIP_MS = 15000;
     const TRIPS_PER_PAGE = 5;
     const ANIMATION_MS = 700;
+    const MAX_STOPS_PER_TRIP = 50;
     const TZ = 'Asia/Bangkok';
 
     const SAMPLE_CSV = `DATE,TRIP NO.,PICKUP TIME (PLAN),TRUCK TYPE,STORE ID,STORE NAME,DELIVERY POINT,LSP
@@ -784,21 +781,14 @@ function escapeHtml(str) {
     }
 
     function buildPages(trips) {
-      const morningTrips = trips.filter(function(x){
-        const parsed = parseHourMinute(x.pickupTime);
-        return (parsed ? parsed.hour : 0) < 12;
-      });
-      const afternoonTrips = trips.filter(function(x){
-        const parsed = parseHourMinute(x.pickupTime);
-        return (parsed ? parsed.hour : 0) >= 12;
-      });
-
       return {
-        pages: paginateTrips(morningTrips, 'morning', 'Số chuyến Ca sáng').concat(
-          paginateTrips(afternoonTrips, 'afternoon', 'Số chuyến Ca chiều')
-        ),
-        morningTrips: morningTrips,
-        afternoonTrips: afternoonTrips
+        pages: [{
+          periodKey: 'all',
+          periodLabel: 'Danh sách chuyến giao',
+          trips: trips
+        }],
+        morningTrips: trips,
+        afternoonTrips: []
       };
     }
 
@@ -881,7 +871,7 @@ function escapeHtml(str) {
 
     function createTripCard(trip, periodKey, pageMaxStops) {
       const card = document.createElement('article');
-      card.className = 'trip-card ' + periodKey;
+      card.className = 'trip-card';
 
       const routeText = trip.stores.map(function(store){
         return store.storeName || store.storeId || '-';
@@ -945,23 +935,20 @@ function escapeHtml(str) {
       const pageMaxStops = page.trips.reduce(function(max, trip){
         return Math.max(max, Math.min(trip.stores.length, maxStops));
       }, 0) || 1;
-      const stopCount = page.trips.reduce(function(sum){
-        return sum + pageMaxStops;
+      const stopCount = page.trips.reduce(function(sum, trip){
+        return sum + Math.min(trip.stores.length, maxStops);
       }, 0);
 
-      els.pageTitle.textContent = page.periodLabel;
-      els.pageSubTitle.textContent = 'Màn hình ' + (page.periodKey === 'morning' ? 'ca sáng' : 'ca chiều') + ' · Trang ' + (pageState.currentIndex + 1) + ' / ' + totalPages;
+      els.pageTitle.textContent = 'Danh sách chuyến giao';
+      els.pageSubTitle.textContent = 'Hiển thị toàn bộ chuyến · cuộn ngang để xem thêm';
       els.pageTripCount.textContent = String(page.trips.length);
       els.pageStopCount.textContent = String(stopCount);
-      els.pageFlipEvery.textContent = 'Manual';
+      els.pageFlipEvery.textContent = 'Thanh cuộn ngang';
       updateNavButtons();
 
       const nextGrid = document.createElement('div');
-      const motion = prevPage && prevPage.periodKey !== page.periodKey ? 'up' : 'left';
-      nextGrid.className = 'trip-grid grid-panel enter-' + motion;
+      nextGrid.className = 'trip-grid grid-panel';
       nextGrid.id = 'tripGrid';
-      const pageTripCount = Math.max(page.trips.length, 1);
-      nextGrid.style.gridTemplateColumns = 'repeat(' + Math.min(pageTripCount, TRIPS_PER_PAGE) + ', 1fr)';
       page.trips.forEach(function(trip){
         nextGrid.appendChild(createTripCard(trip, page.periodKey, pageMaxStops));
       });
@@ -970,12 +957,8 @@ function escapeHtml(str) {
 
       const currentGrid = els.tripGrid;
       if (currentGrid && currentGrid.parentNode) {
-        currentGrid.className = 'trip-grid grid-panel exit-' + motion;
-        els.boardStage.appendChild(nextGrid);
+        currentGrid.parentNode.replaceChild(nextGrid, currentGrid);
         els.tripGrid = nextGrid;
-        setTimeout(function(){
-          if (currentGrid && currentGrid.parentNode) currentGrid.parentNode.removeChild(currentGrid);
-        }, ANIMATION_MS);
       } else {
         els.boardStage.appendChild(nextGrid);
         els.tripGrid = nextGrid;
@@ -983,12 +966,7 @@ function escapeHtml(str) {
     }
 
     function updateNavButtons() {
-      const hasPages = pageState.pages.length > 0;
-      if (els.pageFlipEvery) els.pageFlipEvery.textContent = 'Manual';
-      const prevBtn = document.getElementById('prevPageBtn');
-      const nextBtn = document.getElementById('nextPageBtn');
-      if (prevBtn) prevBtn.disabled = !hasPages;
-      if (nextBtn) nextBtn.disabled = !hasPages;
+      if (els.pageFlipEvery) els.pageFlipEvery.textContent = 'Thanh cuộn ngang';
     }
 
     function renderDashboard(items, sourceLabel) {
@@ -1009,8 +987,8 @@ function escapeHtml(str) {
       els.lastUpdated.textContent = formatNow();
       els.totalStops.textContent = String(items.length);
       els.totalTrips.textContent = String(trips.length);
-      els.morningCount.textContent = String(morningTrips.length);
-      els.afternoonCount.textContent = String(afternoonTrips.length);
+      els.morningCount.textContent = String(trips.length);
+      els.afternoonCount.textContent = '0';
       els.lspCount.textContent = String(lsps.length);
       els.lspList.textContent = lsps.join(' · ') || '-';
       els.footerSource.textContent = 'Nguồn dữ liệu: ' + label + ' · tự làm mới mỗi 60 giây';
@@ -1113,17 +1091,6 @@ function escapeHtml(str) {
       if (refreshTimer) clearInterval(refreshTimer);
       refreshTimer = setInterval(loadRemoteData, REFRESH_MS);
     }
-
-    document.getElementById('prevPageBtn').addEventListener('click', function(event){
-      event.stopPropagation();
-      renderPage(pageState.currentIndex - 1);
-    });
-
-    document.getElementById('nextPageBtn').addEventListener('click', function(event){
-      event.stopPropagation();
-      renderPage(pageState.currentIndex + 1);
-    });
-
     function runTests() {
       const t1 = csvToRows('A,B\n1,2');
       console.assert(t1.length === 2 && t1[1][1] === '2', 'Test csvToRows cơ bản thất bại');
@@ -1147,9 +1114,9 @@ function escapeHtml(str) {
       console.assert(grouped[0].stores[0].storeId === '1001' && grouped[0].stores[2].storeId === '1011', 'Test thứ tự cửa hàng trong trip thất bại');
 
       const pagesData = buildPages(grouped);
-      console.assert(pagesData.pages.length >= 2, 'Test phân trang thất bại');
-      console.assert(pagesData.morningTrips.length === 3, 'Test chia ca sáng thất bại');
-      console.assert(pagesData.afternoonTrips.length === 3, 'Test chia ca chiều thất bại');
+      console.assert(pagesData.pages.length === 1, 'Test hiển thị 1 màn hình cuộn ngang thất bại');
+      console.assert(pagesData.morningTrips.length === grouped.length, 'Test tổng chuyến hiển thị thất bại');
+      console.assert(pagesData.afternoonTrips.length === 0, 'Test không còn tách ca thất bại');
     }
 
     runTests();
@@ -1960,5 +1927,60 @@ html, body {
   font-size: 135% !important;
   font-weight: 900 !important;
   line-height: 1.25 !important;
+}
+</style>
+
+
+<style>
+.board{
+  overflow-x:auto !important;
+  overflow-y:hidden !important;
+  scrollbar-gutter: stable both-edges;
+}
+
+.board-stage{
+  position:relative !important;
+  width:max-content !important;
+  min-width:100% !important;
+  height:100% !important;
+}
+
+.trip-grid{
+  position:relative !important;
+  inset:auto !important;
+  padding:6px !important;
+  display:grid !important;
+  grid-auto-flow:column !important;
+  grid-auto-columns:calc((100vw - 2.6vw) / 5) !important;
+  grid-template-columns:none !important;
+  grid-template-rows:1fr !important;
+  gap:10px !important;
+  align-items:stretch !important;
+  height:100% !important;
+  width:max-content !important;
+  min-width:100% !important;
+}
+
+.board::-webkit-scrollbar{
+  height:16px;
+}
+
+.board::-webkit-scrollbar-track{
+  background:#d7e3f1;
+  border-radius:999px;
+}
+
+.board::-webkit-scrollbar-thumb{
+  background:#7aa7d9;
+  border-radius:999px;
+  border:3px solid #d7e3f1;
+}
+
+.grid-panel,
+.grid-panel.enter-left,
+.grid-panel.enter-up,
+.grid-panel.exit-left,
+.grid-panel.exit-up{
+  animation:none !important;
 }
 </style>
